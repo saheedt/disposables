@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="disposable chat">
+  <meta name="author" content="Saheed Ajibulu">
+  <!-- <link rel="stylesheet" type="text/css" href="./app/styles.css"> -->
+</head>
+<body>
+  <!-- <div id="app-entry" class="app-entry"></div> -->
+  <!-- <script type="text/javascript" src="./app/bundle.js"></script> -->
+
+    <form id="user-form" action="">
+        <input id="u" placeholder="set temporary user name" autocomplete="off" /><button>Set</button>
+    </form>
+    <ul id="messages"></ul>
+    <form id="form" action="">
+        <input id="m" autocomplete="off" /><button>Send</button>
+    </form>
+  <script src="/socket.io/socket.io.js"></script>
+<script>
+  window.addEventListener('load', ()=>{
+    let myData;
+    const socket = io();
+    const form = document.getElementById('form');
+    const userForm = document.getElementById('user-form');
+    const userName = document.getElementById('u');
+    const chatInput = document.getElementById('m');
+    const messages = document.getElementById('messages');
+
+    form.addEventListener('submit', (event)=> {
+        event.preventDefault();
+        socket.emit('chat message', myData, chatInput.value);
+        chatInput.value = '';
+        return false;
+    });
+    userForm.addEventListener('submit', (event)=>{
+        event.preventDefault();
+        socket.emit('set user', userName.value);
+        user = userName.value;
+        userName.value = '';
+        return false;
+    });
+
+    socket.on('chat message', (incomingUserName, message)=>{
+        console.log('chat message from server: ', message);
+        const li = document.createElement('li');
+        li.appendChild(document.createTextNode(`from ${incomingUserName} : ${message}`))
+        messages.appendChild(li);
+    });
+    socket.on('reconnect', () => {
+        socket.emit('reconnection_data', myData);
+    })
+    socket.on('user_id_update_success', (serverUser)=>{
+        console.log('server user obj: ', serverUser);
+        console.log('local user obj: ', user);
+    });
+    socket.on('set user error', () => { console.log('error setting user'); });
+    socket.on('my_data', (userData) => { console.log('received my data:', userData); myData = userData.name });
+  });
+</script>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font: 13px Helvetica, Arial; }
+    form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
+    form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
+    form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+    #user-form { background: #000; padding: 3px; position: fixed; top: 0; width: 100%; height: 10% }
+    #messages { list-style-type: none; margin: 10% 0; padding: 0; }
+    #messages li { padding: 5px 10px; }
+    #messages li:nth-child(odd) { background: #eee; }
+  </style>
+</div>
+</body>
+</html>
