@@ -1,4 +1,4 @@
-export enum IOStatusEvents {
+export enum IoStatusEvents {
     CONNECTION = 'connection',
     DISCONNECT = 'disconnect',
 }
