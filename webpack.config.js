@@ -1,17 +1,15 @@
 const path = require('path'),
-    // miniCssExtractPlugin = require('mini-css-extract-plugin'),
+    miniCssExtractPlugin = require('mini-css-extract-plugin'),
     WebpackShellPlugin = require('webpack-shell-plugin'),
     nodeExternals = require('webpack-node-externals'),
     distDir = path.resolve(__dirname, 'dist'),
     srcDir = path.resolve(__dirname, 'src'),
 
-    /*
     extractPlugin = new miniCssExtractPlugin({
         filename: 'styles.css',
         chunkFilename: 'styles-[hash].css',
         ignoreOrder: false
     }),
-    */
 
     /**
      * This plugin helps run npm command on build completion.
@@ -99,15 +97,15 @@ const clientConfig = {
                     }
                 ]
             },
-            // {
-            //     test: /\.css$/,
-            //     use: [
-            //         {
-            //             loader: miniCssExtractPlugin.loader
-            //         },
-            //         'css-loader'
-            //     ]
-            // },
+            {
+                test: /\.css$/,
+                use: [
+                    {
+                        loader: miniCssExtractPlugin.loader
+                    },
+                    'css-loader'
+                ]
+            },
             {
                 enforce: "pre",
                 test: /\.js?$/,
@@ -116,8 +114,7 @@ const clientConfig = {
             },
         ]
     },
-    plugins: [shellPlugin]
-    // [extractPlugin]
+    plugins: [shellPlugin, extractPlugin]
 };
 
 module.exports = [serverConfig, clientConfig];
