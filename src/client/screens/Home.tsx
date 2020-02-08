@@ -11,7 +11,6 @@ socket.on('reconnect', (data: any) => {
 
 socket.on('disconnect', (reason: any) => {
     console.log('disconnection reason: ', reason)
-    console.log('user: ', socket.ourUser)
 })
 
 const Home = () => {

@@ -12,6 +12,6 @@ export interface Listeners {
 }
 
 export interface Databases {
-    mongo?: MongoController,
+    mongo?: MongoController
     redis?: RedisController
 }

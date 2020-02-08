@@ -1,7 +1,5 @@
 const path = require('path'),
     // miniCssExtractPlugin = require('mini-css-extract-plugin'),
-    // dotenv = require('dotenv'),
-    // webpack = require('webpack'),
     WebpackShellPlugin = require('webpack-shell-plugin'),
     nodeExternals = require('webpack-node-externals'),
     distDir = path.resolve(__dirname, 'dist'),
@@ -12,7 +10,7 @@ const path = require('path'),
         filename: 'styles.css',
         chunkFilename: 'styles-[hash].css',
         ignoreOrder: false
-    });
+    }),
     */
 
     /**
@@ -23,17 +21,7 @@ const path = require('path'),
      */
     shellPlugin = new WebpackShellPlugin({
         onBuildEnd: ['npm run server:dev']
-    })
-
-    // dotenv.config({ path: `${__dirname}/.env` });
-
-    /*
-    const environmentVariables = new webpack.DefinePlugin({
-        'process.env': {
-
-        }
     });
-    */
 
 /**
  *  The build config had to be splitted into two as one targets web (client),
@@ -129,7 +117,7 @@ const clientConfig = {
         ]
     },
     plugins: [shellPlugin]
-    // [extractPlugin, environmentVariables]
+    // [extractPlugin]
 };
 
 module.exports = [serverConfig, clientConfig];

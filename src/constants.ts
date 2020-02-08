@@ -8,3 +8,8 @@ export enum UserEvents {
     FETCH_USER = 'fetch_user',
     ADD_USER_TO_LIST = 'add_user_to_list',
 }
+
+export enum FormInputAsButton {
+    SUBMIT = 'submit',
+    BUTTON = 'button'
+}
