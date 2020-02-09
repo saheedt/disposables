@@ -1,6 +1,6 @@
-import React, { useState } from 'React';
+import React, { useState } from 'react';
 
-import {Input} from './'
+import { Input } from './';
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -15,6 +15,9 @@ const Login = () => {
                 <Input
                     placeholder="Email"
                     label="Email"
+                    type="email"
+                    autoComplete="username"
+                    required={true}
                     extractValue={setEmail}
                 />
             </div>
@@ -23,6 +26,8 @@ const Login = () => {
                     placeholder="Password"
                     label="Password"
                     extractValue={setPassword}
+                    autoComplete="current-password"
+                    required={true}
                     type="password"
                 />
             </div>

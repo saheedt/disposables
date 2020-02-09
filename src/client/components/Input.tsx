@@ -1,9 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, FC, useEffect } from 'react';
 
-import { InputProps } from '../types';
 import { FormInputAsButton } from '../../constants';
 
-const Input = ({ placeholder, extractValue, label, type, disabled=false }: InputProps) => {
+interface InputProps {
+    placeholder?: string
+    label: string
+    type?: string
+    disabled?: boolean
+    autoComplete?: string
+    minLength?: number
+    maxLength?: number
+    required?: boolean
+    extractValue?: Function
+}
+
+const Input: FC<InputProps> = ({ placeholder, extractValue, label,
+    type, autoComplete, required, minLength, maxLength, disabled = false }) => {
     const [value, setValue] = useState('');
 
     const handleChange = (event: any): void => {
@@ -11,10 +23,13 @@ const Input = ({ placeholder, extractValue, label, type, disabled=false }: Input
         extractValue(event.target.value);
     };
 
-    if (type && (type.toLowerCase() == FormInputAsButton.SUBMIT
-        || type.toLowerCase() == FormInputAsButton.BUTTON)) {
-        setValue(label)
-    }
+    useEffect(() => {
+        if (type && (type.toLowerCase() == FormInputAsButton.SUBMIT
+            || type.toLowerCase() == FormInputAsButton.BUTTON)) {
+            setValue(label)
+        }
+    }, []);
+
     return (
         <input
             name={label}
@@ -23,6 +38,10 @@ const Input = ({ placeholder, extractValue, label, type, disabled=false }: Input
             value={value}
             onChange={handleChange}
             type={type}
+            autoComplete={autoComplete}
+            minLength={minLength}
+            maxLength={maxLength}
+            required={required}
             disabled={disabled}
         />
     )

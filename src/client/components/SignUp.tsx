@@ -1,4 +1,4 @@
-import React, { useState } from 'React';
+import React, { useState } from 'react';
 
 import { Input } from './'
 
@@ -21,7 +21,10 @@ const SignUp = () => {
                 <Input
                     placeholder="Email"
                     label="Email"
+                    type="email"
+                    autoComplete="username"
                     extractValue={setEmail}
+                    required={true}
                 />
             </div>
             <div className="form-item-holder">
@@ -29,6 +32,9 @@ const SignUp = () => {
                     placeholder="Password"
                     label="Password"
                     extractValue={setPassword}
+                    autoComplete="new-password"
+                    required={true}
+                    minLength={6}
                     type="password"
                 />
             </div>
@@ -37,12 +43,15 @@ const SignUp = () => {
                     placeholder="Confirm Password"
                     label="Confirm Password"
                     extractValue={isPasswordMatch}
+                    autoComplete="new-password"
+                    required={true}
+                    minLength={6}
                     type="password"
                 />
             </div>
             <div className="form-item-holder">
                 <Input
-                    label="Login"
+                    label="Sign Up"
                     type="submit"
                     disabled={!passwordMatch}
                 />
