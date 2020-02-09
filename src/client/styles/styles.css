@@ -1,0 +1,146 @@
+:root{
+    --color-background-grey: #edf2f7;
+    --color-white: #fff;
+    --color-green: #b5f4a5;
+    --color-purple: #d9a9ff;
+}
+*, :before, :after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    border: 0;
+}
+.container {
+    width: 100vw;
+    min-height: 100vh;
+    background-color: var(--color-background-grey)
+}
+.auth-wrapper{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+.sub-container {
+    padding: 1rem;
+}
+
+.auth-intro-text{
+    width: 50%;
+}
+.auth-input-area{
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.auth-input-area .sub-container-child {
+    width: 100%;
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.auth-input-holder, .auth-input-holder {
+    width: 100%;
+}
+.login-container {
+    background-color: var(--color-white);
+    padding: 3rem;
+    box-shadow: 0 2px 3px 0 rgba(0,0,0,.1), 0 2px 4px 0 rgba(0,0,0, .06);
+}
+.signup-container {
+    background-color: var(--color-white);
+    padding: 3rem;
+    box-shadow: 0 2px 3px 0 rgba(0,0,0,.1), 0 2px 4px 0 rgba(0,0,0, .06);
+}
+.login-container input {
+    margin-top: 1rem;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,.1), 0 1px 3px 0 rgba(0,0,0, .06);
+}
+.signup-container input {
+    margin-top: 1rem;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,.1), 0 1px 3px 0 rgba(0,0,0, .06);
+}
+
+.auth-switch-holder {
+    margin-top: 0.5rem;
+}
+.auth-switch-holder span{
+    margin-right: 0.5rem
+}
+.auth-switch-holder button {
+    margin-left: 0.5rem;
+    background-color: rgba(0,0,0,0);
+}
+.auth-switch-holder button:focus {
+  outline: none;
+}
+input {
+    padding: .5rem;
+    width: 100%;
+    height: 2.5rem;
+}
+input[type=submit], input[type=button] {
+    cursor: pointer;
+    background-color: var(--color-green);
+}
+button {
+    cursor: pointer
+}
+
+/* Small screen breakpoint */
+@media only screen and (max-width: 400px){
+    .auth-intro-text{
+        width: 80%;
+        min-width: 300px;
+    }
+    .auth-intro-text .sub-container-child h1 {
+        font-size: 1rem;
+    }
+    .auth-input-area{
+        width: 80%;
+        min-width: 300px;
+        margin-top: -10rem;
+    }
+    .login-container {
+        background-color: rgba(0,0,0,0);
+        padding: 0;
+        box-shadow:0 0 0 0;
+    }
+    .signup-container {
+        background-color: rgba(0,0,0,0);
+        padding: 0;
+        box-shadow:0 0 0 0;
+    }
+    .login-container input {
+        margin-top: 0.5rem;
+    }
+    .signup-container input {
+        margin-top: 0.5rem;
+    }
+}
+
+/* Medium screen breakpoint */
+@media only screen and (min-width: 401px) and (max-width: 960px) {
+    .auth-intro-text{
+        min-width: 350px;
+    }
+    .auth-input-area{
+        min-width: 350px;
+    }
+    .login-container, .signup-container {
+        background-color: var(--color-white);
+    }
+}
+
+/* Large screen breakpoint */
+@media only screen and (min-width: 961px){
+    .auth-intro-text{
+        max-width: 450px;
+    }
+    .auth-input-area{
+        max-width: 450px;
+    }
+}

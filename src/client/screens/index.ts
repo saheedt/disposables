@@ -1,4 +1,5 @@
+import App from './App';
 import Home from './Home';
 import Auth from './Auth';
 
-export { Home, Auth };
+export { App, Home, Auth };

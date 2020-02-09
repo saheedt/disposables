@@ -1,6 +1,6 @@
 import React, { FC, ReactChildren } from 'react';
 
-const Container: FC<{children: ReactChildren}> = ({ children }) => {
+const Container: FC<{children: any}> = ({ children }) => {
     return (
         <main className="container">{children}</main>
     )

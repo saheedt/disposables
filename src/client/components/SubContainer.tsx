@@ -1,6 +1,5 @@
 import React, { FC } from 'react';
 
-// type wrappertype = { section: string,  div: string }
 interface TagType {
     [key: string]: string
 }
