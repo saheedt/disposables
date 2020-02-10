@@ -4,6 +4,7 @@ import { Input } from './'
 
 const SignUp = () => {
     const [email, setEmail] = useState('');
+    const [userName, setUserName] = useState('');
     const [password, setPassword] = useState('');
     const [passwordMatch, setPasswordMatch] = useState(false);
 
@@ -24,6 +25,16 @@ const SignUp = () => {
                     type="email"
                     autoComplete="username"
                     extractValue={setEmail}
+                    required={true}
+                />
+            </div>
+            <div className="form-item-holder">
+                <Input
+                    placeholder="Username"
+                    label="Username"
+                    type="text"
+                    autoComplete="username"
+                    extractValue={setUserName}
                     required={true}
                 />
             </div>

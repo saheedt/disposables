@@ -102,7 +102,7 @@ button {
     .auth-input-area{
         width: 80%;
         min-width: 300px;
-        margin-top: -10rem;
+        margin-top: -7rem;
     }
     .login-container {
         background-color: rgba(0,0,0,0);
@@ -129,10 +129,13 @@ button {
     }
     .auth-input-area{
         min-width: 350px;
+        margin-top: -1rem;
     }
     .login-container, .signup-container {
         background-color: var(--color-white);
+        padding: 1.5rem;
     }
+
 }
 
 /* Large screen breakpoint */
