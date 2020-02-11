@@ -21,8 +21,6 @@ export class SocketController {
         const chatListener = listeners.ChatListener;
         this.io.on(IoStatusEvents.CONNECTION, (socket: any) => {
             console.log('connected:', socket.id);
-            socket.ourUser = "my precious"
-            console.log("connect user ==>", socket.ourUser)
             userListerner.listen(socket);
             chatListener.listen(socket);
         });

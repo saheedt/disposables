@@ -2,7 +2,7 @@ import React, { useState, FC, useEffect } from 'react';
 
 import { FormInputAsButton } from '../../constants';
 
-interface InputProps {
+interface PropType {
     placeholder?: string
     label: string
     type?: string
@@ -14,7 +14,7 @@ interface InputProps {
     extractValue?: Function
 }
 
-const Input: FC<InputProps> = ({ placeholder, extractValue, label,
+const Input: FC<PropType> = ({ placeholder, extractValue, label,
     type, autoComplete, required, minLength, maxLength, disabled = false }) => {
     const [value, setValue] = useState('');
 

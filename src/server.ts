@@ -24,9 +24,9 @@ app.get('*', (req: Request, res: Response) => {
 });
 
 // spin up a single DB and store instance respectively
-const mongo = new MongoController();
-const redis = new RedisController();
-const redisAdapter = redis.initRedisAdapder(process.env.REDIS_URI);
+const mongoClient = new MongoController();
+const redisClient = new RedisController();
+const redisAdapter = RedisController.initRedisAdapder(process.env.REDIS_URI);
 
 console.log('incoming...');
 
@@ -34,11 +34,16 @@ console.log('incoming...');
 const socket = new SocketController(server, socketIo);
 const chatHandler = new ChatHandler()
 const userHandler = new UserHandler();
-userHandler.connectDb(mongo.instance);
-socket.connect({
-    ChatListener: new ChatListener(chatHandler),
-    UserListener: new UserListener(userHandler)
-});
-socket.attachAdapter(redisAdapter);
-
-server.listen(PORT, ()=> console.log(`Server listening on port ${PORT}`));
+console.log('now..')
+const start = Date.now();
+setTimeout(() => {
+    userHandler.connectDb(mongoClient.instance);
+    socket.connect({
+        ChatListener: new ChatListener(chatHandler),
+        UserListener: new UserListener(userHandler)
+    });
+    socket.attachAdapter(redisAdapter);
+    server.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
+    const end = Date.now() - start;
+    console.log(`Took: ${Math.floor(end / 1000)} second(s)`);
+}, 1000);

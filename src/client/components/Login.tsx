@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, FC } from 'react';
 
 import { Input } from './';
 
-const Login = () => {
+interface PropType {
+    doLogin: Function
+}
+const Login: FC<PropType> = ({ doLogin }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 

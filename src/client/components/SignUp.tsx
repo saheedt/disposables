@@ -1,8 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, FC } from 'react';
+
+import { UserEvents } from '../../constants';
 
 import { Input } from './'
 
-const SignUp = () => {
+interface PropType {
+    doSignUp(event: string, data: any): void
+}
+const SignUp: FC<PropType> = ({ doSignUp }) => {
     const [email, setEmail] = useState('');
     const [userName, setUserName] = useState('');
     const [password, setPassword] = useState('');
@@ -11,13 +16,17 @@ const SignUp = () => {
     const isPasswordMatch = (incoming: string): void => {
         setPasswordMatch(password === incoming);
     };
-    // TODO: A useEffect lifecycle method,
-    // watching for changes on email & password
-    // to update parent component state as needed.
-    // Also implement a <span> to announce password
+
+    const signUp = (event: React.FormEvent<HTMLFormElement>): void => {
+        event.preventDefault();
+        const userDetails = { email, userName, password };
+        doSignUp(UserEvents.CREATE_USER, userDetails);
+    };
+    // TODO:
+    // Implement a <span> to announce password
     // match status.
     return (
-        <form className="signup-container">
+        <form className="signup-container" onSubmit={signUp}>
             <div className="form-item-holder">
                 <Input
                     placeholder="Email"

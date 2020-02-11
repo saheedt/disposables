@@ -2,14 +2,28 @@ import { default as mongo } from 'mongodb';
 
 export default class MongoController {
     private mongoInstance: mongo.MongoClient
+    private dBInstance: mongo.Db;
+
     constructor() {
-        console.log("[mongo URI]: ", process.env['MONGO_URI'])
+        console.log("[mongo URI]: ", process.env.MONGO_URI)
         const uri = process.env['MONGO_URI'];
-        this.mongoInstance = new mongo.MongoClient(uri)
+        mongo.MongoClient.connect(uri, { useUnifiedTopology: true })
+            .then(client => {
+                if (client)
+                    this.mongoInstance = client;
+                    this.dBInstance = this.mongoInstance.db(process.env.MONGO_DB_NAME);
+            })
+            .catch(e => {
+                // TODO: Implement user friendly error messages to send back to client
+                // Also socket should be closed here?..
+                // { code: 500, message: 'Internal server error' };
+                console.log('error connecting to db: ', e)
+            });
+
     }
 
-    get instance(): mongo.MongoClient {
-        return this.mongoInstance;
+    get instance(): mongo.Db {
+        return this.dBInstance;
     }
 
     close(): void {

@@ -1,4 +1,5 @@
-import ChatHandler from './ChatHandler';
-import UserHandler from './UserHandler';
+import ChatHandler from './chatHandler';
+import UserHandler from './userHandler';
+import BaseHandler from './baseHandler';
 
 export { ChatHandler, UserHandler };

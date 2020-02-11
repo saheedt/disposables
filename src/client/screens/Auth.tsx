@@ -1,5 +1,6 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useState, useContext, useEffect } from 'react';
 
+import { SocketContext } from '../context/socketContext';
 import { Login, SignUp, SubContainer, Button } from '../components';
 
 
@@ -7,6 +8,19 @@ const Auth = () => {
     const [authType, setAuthType] = useState('Login');
     const [buttonText, setButtonText] = useState('Sign Up');
 
+    const context = useContext(SocketContext);
+
+    useEffect(() => {
+        const successObservable = context.onSIgnUpSuccess();
+        const errorObservable = context.onSignUpError();
+        successObservable.subscribe((userData: any) => {
+            console.log('Al hamdulillah, we are now here..', userData);
+        });
+        errorObservable.subscribe((error: any) => {
+            console.log('Error user: ', error);
+        })
+
+    }, []);
     const switchHandler = (event: React.MouseEvent<HTMLButtonElement>): void => {
         if (authType === "Login") {
             setAuthType('Sign Up');
@@ -26,11 +40,12 @@ const Auth = () => {
     }
 
     const renderAuthComponent = () => {
+        console.log('auth context', context);
         if (authType === 'Login') {
-            return (<Login />)
+            return (<Login doLogin={(event: string, data: any) => context.send(event, data) }/>)
         }
         if (authType === 'Sign Up') {
-            return (<SignUp />)
+            return (<SignUp doSignUp={(event: string, data: any) => context.send(event, data)}/>)
         }
     };
 
