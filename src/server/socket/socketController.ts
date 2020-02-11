@@ -20,7 +20,7 @@ export class SocketController {
         const userListerner = listeners.UserListener;
         const chatListener = listeners.ChatListener;
         this.io.on(IoStatusEvents.CONNECTION, (socket: any) => {
-            console.log('connected:', socket.id);
+            console.info('connected:', socket.id);
             userListerner.listen(socket);
             chatListener.listen(socket);
         });

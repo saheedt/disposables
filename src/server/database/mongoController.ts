@@ -6,7 +6,7 @@ export default class MongoController {
 
     constructor() {
         console.log("[mongo URI]: ", process.env.MONGO_URI)
-        const uri = process.env['MONGO_URI'];
+        const uri = process.env.MONGO_URI;
         mongo.MongoClient.connect(uri, { useUnifiedTopology: true })
             .then(client => {
                 if (client)
@@ -17,7 +17,7 @@ export default class MongoController {
                 // TODO: Implement user friendly error messages to send back to client
                 // Also socket should be closed here?..
                 // { code: 500, message: 'Internal server error' };
-                console.log('error connecting to db: ', e)
+                console.error('error connecting to db: ', e)
             });
 
     }

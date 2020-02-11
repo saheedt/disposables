@@ -28,14 +28,11 @@ const mongoClient = new MongoController();
 const redisClient = new RedisController();
 const redisAdapter = RedisController.initRedisAdapder(process.env.REDIS_URI);
 
-console.log('incoming...');
-
 // setup socket, it's listeners and handlers
 const socket = new SocketController(server, socketIo);
 const chatHandler = new ChatHandler()
 const userHandler = new UserHandler();
-console.log('now..')
-const start = Date.now();
+
 setTimeout(() => {
     userHandler.connectDb(mongoClient.instance);
     socket.connect({
@@ -43,7 +40,5 @@ setTimeout(() => {
         UserListener: new UserListener(userHandler)
     });
     socket.attachAdapter(redisAdapter);
-    server.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
-    const end = Date.now() - start;
-    console.log(`Took: ${Math.floor(end / 1000)} second(s)`);
+    server.listen(PORT, () => console.info(`Server listening on port ${PORT}`));
 }, 1000);

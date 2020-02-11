@@ -4,7 +4,7 @@ import { MongoController, RedisController } from './database';
 import { UserHandler, ChatHandler } from './socket/handlers';
 
 export interface Listener {
-    listen(s: socketIo.EngineSocket, db: any): void
+    listen(s: socketIo.EngineSocket): void
 }
 
 export interface Listeners {

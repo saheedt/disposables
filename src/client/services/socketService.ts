@@ -9,7 +9,6 @@ export class SocketService {
     init(port: string | number): SocketService {
         console.log('opening socket in client');
         this.socket = io(`localhost:${port}`);
-        console.log('SocketService instance: ', this)
         return this;
     }
     // SUpply appropriate types..
