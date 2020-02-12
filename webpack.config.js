@@ -1,19 +1,15 @@
 const path = require('path'),
-    // miniCssExtractPlugin = require('mini-css-extract-plugin'),
-    // dotenv = require('dotenv'),
-    // webpack = require('webpack'),
+    miniCssExtractPlugin = require('mini-css-extract-plugin'),
     WebpackShellPlugin = require('webpack-shell-plugin'),
     nodeExternals = require('webpack-node-externals'),
     distDir = path.resolve(__dirname, 'dist'),
     srcDir = path.resolve(__dirname, 'src'),
 
-    /*
     extractPlugin = new miniCssExtractPlugin({
         filename: 'styles.css',
         chunkFilename: 'styles-[hash].css',
         ignoreOrder: false
-    });
-    */
+    }),
 
     /**
      * This plugin helps run npm command on build completion.
@@ -23,17 +19,7 @@ const path = require('path'),
      */
     shellPlugin = new WebpackShellPlugin({
         onBuildEnd: ['npm run server:dev']
-    })
-
-    // dotenv.config({ path: `${__dirname}/.env` });
-
-    /*
-    const environmentVariables = new webpack.DefinePlugin({
-        'process.env': {
-
-        }
     });
-    */
 
 /**
  *  The build config had to be splitted into two as one targets web (client),
@@ -111,15 +97,15 @@ const clientConfig = {
                     }
                 ]
             },
-            // {
-            //     test: /\.css$/,
-            //     use: [
-            //         {
-            //             loader: miniCssExtractPlugin.loader
-            //         },
-            //         'css-loader'
-            //     ]
-            // },
+            {
+                test: /\.css$/,
+                use: [
+                    {
+                        loader: miniCssExtractPlugin.loader
+                    },
+                    'css-loader'
+                ]
+            },
             {
                 enforce: "pre",
                 test: /\.js?$/,
@@ -128,8 +114,7 @@ const clientConfig = {
             },
         ]
     },
-    plugins: [shellPlugin]
-    // [extractPlugin, environmentVariables]
+    plugins: [extractPlugin, shellPlugin]
 };
 
 module.exports = [serverConfig, clientConfig];
