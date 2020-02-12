@@ -33,6 +33,16 @@ export default class BaseHandler {
         }
     }
 
+    async verifyPassword(unEncrypted: string, encrypted: string): Promise<Boolean> {
+        try {
+            const match = await compare(unEncrypted, encrypted);
+            return match;
+        } catch (error) {
+            console.error('[Error]: ', 'Error comparing passwords ', error);
+            return null;
+        }
+    }
+
     generateToken(data: any, exipry = '12 weeks'): string {
         try {
             return jwt.sign(data, process.env.JWT_SECRET, { expiresIn: exipry });

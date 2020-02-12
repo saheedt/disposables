@@ -1,6 +1,7 @@
 export enum IoStatusEvents {
     CONNECTION = 'connection',
     DISCONNECT = 'disconnect',
+    RECONNECT = 'reconnect'
 }
 
 export enum UserEvents {
@@ -17,12 +18,16 @@ export enum UserEvents {
     FETCH_LIST = 'fetch_list',
     FETCH_LIST_SUCCESS = 'fetch_list_success',
     FETCH_LIST_ERROR = 'fetch_list_error',
+    USER_RECONNECT_DATA = 'user_reconnect_data',
 }
 
 export enum UserErrors {
+    USER_ERROR_CREDENTIALS = 'Invalid credentials supplied, please review',
+    USER_ERROR_PASSWORD = 'Why password so short?, please review',
     CREATE_USER_ERROR_SERVER = 'Error creating user, try again soon',
-    CREATE_USER_ERROR_CREDENTIALS = 'Invalid credentials supplied, please review',
-    CREATE_USER_ERROR_DUPLICATE = 'User account already exisits'
+    CREATE_USER_ERROR_DUPLICATE_EMAIL = 'Account exists for this email address',
+    CREATE_USER_ERROR_DUPLICATE_USERNAME = 'Username already taken',
+    AUTH_USER_ERROR_NON_EXISTENT = 'Casper?.. Account does not exist.'
 }
 
 export enum StatusCodes {
@@ -47,4 +52,8 @@ export enum FormInputAsButton {
 
 export enum DbCollections {
     users = 'users'
+}
+
+export enum LocalStorageKeys {
+    USER_DATA = 'dspsbl__usr'
 }

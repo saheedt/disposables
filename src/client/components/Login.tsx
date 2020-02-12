@@ -2,18 +2,23 @@ import React, { useState, FC } from 'react';
 
 import { Input } from './';
 
+import { UserEvents } from '../../constants';
+
 interface PropType {
     doLogin: Function
 }
+
 const Login: FC<PropType> = ({ doLogin }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    // TODO: A useEffect lifecycle method,
-    // watching for changes on email & password
-    // to update parent component state as needed.
+    const login = (event: React.FormEvent<HTMLFormElement>): void => {
+        event.preventDefault();
+        const loginDetails = { email, password };
+        doLogin(UserEvents.AUTH_USER, loginDetails);
+    };
     return (
-        <form className="login-container">
+        <form className="login-container" onSubmit={login}>
             <div className="form-item-holder">
                 <Input
                     placeholder="Email"

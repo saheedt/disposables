@@ -2,25 +2,53 @@ import React, { Fragment, useState, useContext, useEffect } from 'react';
 
 import { SocketContext } from '../context/socketContext';
 import { Login, SignUp, SubContainer, Button } from '../components';
+import Helper from '../utils/helper';
 
+import { LocalStorageKeys } from '../../constants';
 
 const Auth = () => {
     const [authType, setAuthType] = useState('Login');
     const [buttonText, setButtonText] = useState('Sign Up');
-
     const context = useContext(SocketContext);
 
+    const handleAuthSuccess = (userData: any) => {
+        console.log('Al hamdulillah, we are now here..', userData);
+        try {
+            const localData = localStorage.getItem(LocalStorageKeys.USER_DATA);
+            if (localData) {
+                localStorage.removeItem(LocalStorageKeys.USER_DATA);
+            }
+            const dataClone = Helper.clone(userData);
+            delete dataClone.code;
+            localStorage.setItem(LocalStorageKeys.USER_DATA, JSON.stringify(dataClone));
+            // implement routing here
+        } catch (error) {
+            // Temporarily log error, but should implement
+            // error notification and not route away from page.
+            console.error('Error: ', error);
+        }
+    };
+    const handleAuthError = (error: any) => {
+        // Temporarily log error, but should implement
+        // error notification and not route away from page.
+        console.error('Error user: ', error);
+    };
     useEffect(() => {
-        const successObservable = context.onSIgnUpSuccess();
-        const errorObservable = context.onSignUpError();
-        successObservable.subscribe((userData: any) => {
-            console.log('Al hamdulillah, we are now here..', userData);
-        });
-        errorObservable.subscribe((error: any) => {
-            console.log('Error user: ', error);
-        })
+        const signUpSuccessObservable = context.onSIgnUpSuccess();
+        const signUpErrorObservable = context.onSignUpError();
+
+        const loginSuccessObservable = context.onLoginSuccess();
+        const loginErrorObservable = context.onLoginError();
+        // signup observables
+        signUpSuccessObservable.subscribe(handleAuthSuccess);
+        signUpErrorObservable.subscribe(handleAuthError);
+        // login observables
+        loginSuccessObservable.subscribe(handleAuthSuccess);
+        loginErrorObservable.subscribe(handleAuthError);
+
 
     }, []);
+    
     const switchHandler = (event: React.MouseEvent<HTMLButtonElement>): void => {
         if (authType === "Login") {
             setAuthType('Sign Up');

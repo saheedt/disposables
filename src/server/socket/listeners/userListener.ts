@@ -14,7 +14,7 @@ export default class UserListerner implements Listener {
 
     listen(socket: socketIo.EngineSocket): void {
         socket.on(UserEvents.CREATE_USER, (user: any) => this.handler.createUser(user, socket));
-        socket.on('handle_reconnection', (data: any) => { console.log(data) });
+        socket.on(UserEvents.AUTH_USER, (user: any) => this.handler.authenticateUser(user, socket));
         socket.on('disconnect', (reason: any) => {
             console.log('server disonnect reason: ', reason);
          });
