@@ -6,6 +6,7 @@ import Login from './Login';
 import SignUp from './SignUp';
 import ChatList from './ChatList';
 import ChatListItem from './ChatListItem';
+import ChatPane from './ChatPane';
 import ChatMessage from './ChatMessage';
 
 export {
@@ -17,5 +18,6 @@ export {
     SignUp,
     ChatList,
     ChatListItem,
+    ChatPane,
     ChatMessage
 };

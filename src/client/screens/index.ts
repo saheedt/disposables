@@ -1,5 +1,5 @@
 import App from './App';
 import Home from './Home';
-import Auth from './Auth';
+import Chat from './Chat';
 
-export { App, Home, Auth };
+export { App, Chat, Home };

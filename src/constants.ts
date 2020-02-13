@@ -57,3 +57,8 @@ export enum DbCollections {
 export enum LocalStorageKeys {
     USER_DATA = 'dspsbl__usr'
 }
+
+export enum ClientRoutes {
+    HOME = '/',
+    CHAT = '/chat'
+}
