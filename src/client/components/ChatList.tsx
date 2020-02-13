@@ -19,10 +19,10 @@ const ChatList: FC<PropType> = ({ friendList }) => {
     };
 
     return (
-        <ul>
-            <li>Here we list all..</li>
+        <ul className="chat-list">
+            <li className="chat-list-item" >Here we list all..</li>
             {list && list.length > 0 ?
-                { ...RenderList() }
+                RenderList()
                 :
                 null
             }

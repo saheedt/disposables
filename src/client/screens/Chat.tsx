@@ -13,15 +13,20 @@ const Chat: FC<any> = ({ history }) => {
         const localUserData = localStorage.getItem(LocalStorageKeys.USER_DATA);
         !localUserData && history.push('/');
     }, []);
-
+    const dummyFriendList = [
+        { userName: 'aubama-bloodclot-yang' },
+        { userName: 'Lacazette' },
+        { userName: 'Hectizee' },
+        { userName: 'M10Mesut' },
+        { userName: 'kolasinac' },
+    ];
     return (
-        <Fragment>
-            <h1>Chat Screen</h1>
-            <Route component={ChatList} />
+        <section className="chat-container">
+            <Route render={(props) => <ChatList friendList={dummyFriendList} {...props}/>} />
             <Media query={Helper.routeMediaQueries.mobile}>
                 { mobile => !mobile && <Route component={ChatPane} /> }
             </Media>
-        </Fragment>
+        </section>
     );
  };
 

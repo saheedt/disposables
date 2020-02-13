@@ -7,7 +7,7 @@ interface PropType {
 const ChatListItem: FC<PropType> = ({ userName }) => {
 
     return (
-        <li>
+        <li className="chat-list-item">
             <p>{userName}</p>
         </li>
     );
