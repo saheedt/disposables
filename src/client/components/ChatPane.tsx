@@ -33,11 +33,13 @@ const ChatPane: FC<PropType> = ({ incomingMessage, messageHistory }) => {
         <section className="chat-pane-container">
             <div className="chat-pane-messages-holder">
                 <ul className="chat-pane-messages">
-                    <li> Here we display chat </li>
+                    <li> <span className="incoming">Here we display chat</span> </li>
                     {(messages && messages.length > 0) ?
                         {...renderChatMessages()}
                         :
-                        <li className="chat-pane-default-message">Le beginning 😁</li>
+                        <li className="chat-pane-default-message">
+                            <span className="author">Le beginning 😁</span>
+                        </li>
                     }
                 </ul>
             </div>

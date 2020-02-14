@@ -24,14 +24,16 @@ const ChatList: FC<PropType> = ({ friendList, match }) => {
     };
 
     return (
-        <ul className="chat-list">
-            <li className="chat-list-item" >Here we list all..</li>
-            {list && list.length > 0 ?
-                RenderList()
-                :
-                null
-            }
-        </ul>
+        <section className="chat-list-container">
+            <ul className="chat-list">
+                <li className="chat-list-item" >Here we list all..</li>
+                {list && list.length > 0 ?
+                    RenderList()
+                    :
+                    null
+                }
+            </ul>
+        </section>
     );
  }
 
