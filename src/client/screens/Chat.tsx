@@ -1,5 +1,5 @@
-import React, { FC, Fragment, useEffect } from 'react';
-import { Route, Redirect } from 'react-router-dom';
+import React, { FC, Fragment, useEffect, useState } from 'react';
+import { Route, Redirect, Switch } from 'react-router-dom';
 import Media from 'react-media';
 
 import { ChatList, ChatPane } from '../components';
@@ -7,8 +7,9 @@ import { ChatList, ChatPane } from '../components';
 import { LocalStorageKeys } from '../../constants';
 import Helper from '../utils/helper';
 
-const Chat: FC<any> = ({ history }) => {
-
+const Chat: FC<any> = ({ history, match }) => {
+    const [chatView, setChatView] = useState(false);
+    console.log(match);
     useEffect(() => {
         const localUserData = localStorage.getItem(LocalStorageKeys.USER_DATA);
         !localUserData && history.push('/');
@@ -20,14 +21,52 @@ const Chat: FC<any> = ({ history }) => {
         { userName: 'M10Mesut' },
         { userName: 'kolasinac' },
     ];
+
+    // const handleItemCLick = (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+    //     event.preventDefault();
+    //     setChatView(!chatView);
+    // };
+
     return (
         <section className="chat-container">
-            <Route render={(props) => <ChatList friendList={dummyFriendList} {...props}/>} />
             <Media query={Helper.routeMediaQueries.mobile}>
-                { mobile => !mobile && <Route component={ChatPane} /> }
+                {
+                    mobile =>
+                        mobile ?
+                            (
+                                <Switch>
+                                    <Route
+                                        exact
+                                        path={`${match.url}/pane`}
+                                        render={(props) => <ChatPane incomingMessage={null} messageHistory={null} {...props} /> }
+                                    />
+                                    <Route exact path={`${match.url}`} render={(props) => <ChatList friendList={dummyFriendList} {...props} />} />
+                                </Switch>
+                            )
+                            :
+                            (
+                                <>
+                                    <Route path={`${match.url}/pane`} render={(props) => <ChatList friendList={dummyFriendList} {...props} />} />
+                                    <Route path={`${match.url}/pane`} render={ (props) => <ChatPane incomingMessage={null} messageHistory={null} {...props} /> } />
+                                    <Redirect from={`${match.url}`} to={`${match.url}/pane`} />
+                                </>
+                            )
+
+                }
             </Media>
         </section>
     );
  };
 
 export default Chat;
+
+
+/**
+ * const timeCreated = new Date();
+ * const timeCreatedUtc = timeCreated.toISOString();
+ * const tz = timeCreated.getTimezoneOffset();
+ * const sign = tz > 0 ? '-': '+';
+ * const tzOffsetHr = (Math.floor(Math.abs(tz)/60);
+ * const tzOffsetMin = (Math.abs(tz)%60);
+ * const tzOffset = sign + hours + ":" + minutes;
+ */

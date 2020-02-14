@@ -7,7 +7,7 @@ interface PropType {
     messageHistory: any
 }
 
-const ChatPane: FC<PropType> = ({ incomingMessage, messageHistory}) => {
+const ChatPane: FC<PropType> = ({ incomingMessage, messageHistory }) => {
 
     const [messages, setMessages] = useState([]);
 
@@ -17,6 +17,7 @@ const ChatPane: FC<PropType> = ({ incomingMessage, messageHistory}) => {
     useEffect(() => {
 
     }, [incomingMessage]);
+
 
     const renderChatMessages = () => {
         return messages.map((item, index) => (

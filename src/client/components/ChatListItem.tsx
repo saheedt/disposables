@@ -1,14 +1,17 @@
 import React, { FC } from 'react';
-
+import { Link, withRouter } from 'react-router-dom';
 interface PropType {
-    userName: string
+    userName: string,
+    match: any,
 }
 
-const ChatListItem: FC<PropType> = ({ userName }) => {
+const ChatListItem: FC<PropType> = ({ userName, match  }) => {
 
     return (
         <li className="chat-list-item">
-            <p>{userName}</p>
+            <Link to={`${match.url}/pane`}>
+                <p>{userName}</p>
+            </Link>
         </li>
     );
  };

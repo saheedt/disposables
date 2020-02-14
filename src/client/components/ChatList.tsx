@@ -3,9 +3,10 @@ import React, { FC, useState, useEffect } from 'react';
 import { ChatListItem } from './';
 
 interface PropType {
-    friendList: any[]
+    friendList: any[],
+    match: any
 }
-const ChatList: FC<PropType> = ({ friendList }) => {
+const ChatList: FC<PropType> = ({ friendList, match }) => {
     const [list, setList] = useState([]);
 
     useEffect(() => {
@@ -14,7 +15,11 @@ const ChatList: FC<PropType> = ({ friendList }) => {
 
     const RenderList = () => {
         return list.map((item, index) => (
-            <ChatListItem key={`${item.userName}__${index}`} userName={item.userName} />
+            <ChatListItem
+                key={`${item.userName}__${index}`}
+                userName={item.userName}
+                match={match}
+            />
         ));
     };
 

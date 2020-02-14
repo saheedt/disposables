@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from 'react';
 
-import { BrowserRouter, Route } from "react-router-dom";
+import { BrowserRouter, Route, Switch } from "react-router-dom";
 
 import { Chat, Home } from '.'
 import { Container } from '../components';
@@ -31,8 +31,11 @@ const App = () => {
     return (
         <BrowserRouter>
             <Container>
-                <Route exact path={`${ClientRoutes.HOME}`} component={Home} />
-                <Route path={`${ClientRoutes.CHAT}`} component={Chat} />
+                <Switch>
+                    <Route exact path={`${ClientRoutes.HOME}`} component={Home} />
+                    <Route path={`${ClientRoutes.CHAT}`} component={Chat} />
+                </Switch>
+
             </Container>
         </BrowserRouter>
     )
