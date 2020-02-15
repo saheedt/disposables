@@ -11,6 +11,10 @@ export default class UserListerner implements Listener {
     constructor(handler: UserHandler) {
         this.handler = handler;
     }
+    
+    get handlerInstance(): UserHandler {
+        return this.handler;
+    }
 
     listen(socket: socketIo.EngineSocket): void {
         socket.on(UserEvents.CREATE_USER, (user: any) => this.handler.createUser(user, socket));

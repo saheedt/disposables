@@ -1,8 +1,9 @@
 export enum IoStatusEvents {
     CONNECTION = 'connection',
     DISCONNECT = 'disconnect',
-    RECONNECT = 'reconnect'
+    RECONNECT = 'reconnect',
 }
+
 
 export enum UserEvents {
     CREATE_USER = 'create_user',
@@ -19,15 +20,19 @@ export enum UserEvents {
     FETCH_LIST_SUCCESS = 'fetch_list_success',
     FETCH_LIST_ERROR = 'fetch_list_error',
     USER_RECONNECT_DATA = 'user_reconnect_data',
+    USER_UNAUTHORIZED = 'user_unauthorized',
+    USER_SOCKET_SYNC_SUCCESS = 'user_socket_sync_success',
+    USER_SOCKET_SYNC_ERROR = 'user_socket_sync_error',
 }
 
-export enum UserErrors {
+export enum UserErrorMesssages {
     USER_ERROR_CREDENTIALS = 'Invalid credentials supplied, please review',
     USER_ERROR_PASSWORD = 'Why password so short?, please review',
     CREATE_USER_ERROR_SERVER = 'Error creating user, try again soon',
     CREATE_USER_ERROR_DUPLICATE_EMAIL = 'Account exists for this email address',
     CREATE_USER_ERROR_DUPLICATE_USERNAME = 'Username already taken',
-    AUTH_USER_ERROR_NON_EXISTENT = 'Casper?.. Account does not exist.'
+    AUTH_USER_ERROR_NON_EXISTENT = 'Casper?.. Account does not exist.',
+    AUTH_INVALID_TOKEN = 'Invalid token',
 }
 
 export enum StatusCodes {

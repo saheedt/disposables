@@ -1,15 +1,27 @@
 import React, { useContext, useEffect } from 'react';
 
-import { BrowserRouter, Route, Switch } from "react-router-dom";
+import { Route, Switch, useHistory } from "react-router-dom";
 
 import { Chat, Home } from '.'
 import { Container } from '../components';
 import { SocketContext } from '../context/socketContext';
 
 import { ClientRoutes, LocalStorageKeys, UserEvents } from '../../constants';
+import Helper from '../utils/helper';
 
 const App = () => {
     const context = useContext(SocketContext);
+    const history = useHistory();
+    
+    const reConnectionHandler = () => {
+        const userData = Helper.fetchLocalStorageItem(LocalStorageKeys.USER_DATA);
+        userData && context.send(UserEvents.USER_RECONNECT_DATA, userData);
+    };
+
+    const handleUnAuthorizedUser = () => {
+        Helper.removeLocalStorageItem(LocalStorageKeys.USER_DATA);
+        history.push(ClientRoutes.HOME);
+     };
 
     useEffect(() => {
         /**
@@ -20,23 +32,29 @@ const App = () => {
          *  2. [optional]: validate user credentials and possibly prompt user to Authenticate
          *      if token if expired or do nothing if no token was sent.
          */
-
         const reconnectObservable = context.onReconnect();
-        reconnectObservable.subscribe(() => {
-            const userData = localStorage.getItem(LocalStorageKeys.USER_DATA)
-            context.send(UserEvents.USER_RECONNECT_DATA, { userData: JSON.parse(userData) });
-        })
+        const onUserUnAuthorized = context.onUserUnAuthorized();
+        const userSocketSyncErrorObservable = context.onUserSocketSyncError();
+        const userSocketSyncSuccessObservable = context.onUserSocketSyncSuccess();
+
+        reconnectObservable.subscribe(reConnectionHandler);
+        onUserUnAuthorized.subscribe(handleUnAuthorizedUser);
+        userSocketSyncErrorObservable.subscribe(() => {
+            localStorage.removeItem(LocalStorageKeys.USER_DATA);
+            history.push(ClientRoutes.HOME);
+        });
+        userSocketSyncSuccessObservable.subscribe((data) => {
+            console.log('current data on sync success: ', data);
+        });
     }, []);
 
     return (
-        <BrowserRouter>
-            <Container>
-                <Switch>
-                    <Route exact path={`${ClientRoutes.HOME}`} component={Home} />
-                    <Route path={`${ClientRoutes.CHAT}`} component={Chat} />
-                </Switch>
-            </Container>
-        </BrowserRouter>
+        <Container>
+            <Switch>
+                <Route exact path={`${ClientRoutes.HOME}`} component={Home} />
+                <Route path={`${ClientRoutes.CHAT}`} component={Chat} />
+            </Switch>
+        </Container>
     )
 }
 

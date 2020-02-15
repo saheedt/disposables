@@ -34,7 +34,7 @@ const chatHandler = new ChatHandler()
 const userHandler = new UserHandler();
 
 setTimeout(() => {
-    userHandler.connectDb(mongoClient.instance);
+    userHandler.connectDb(mongoClient.instance, redisClient.instance);
     socket.connect({
         ChatListener: new ChatListener(chatHandler),
         UserListener: new UserListener(userHandler)

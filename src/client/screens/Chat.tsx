@@ -9,7 +9,7 @@ import Helper from '../utils/helper';
 
 const Chat: FC<any> = ({ history, match }) => {
     const [chatView, setChatView] = useState(false);
-    console.log(match);
+
     useEffect(() => {
         const localUserData = localStorage.getItem(LocalStorageKeys.USER_DATA);
         !localUserData && history.push('/');

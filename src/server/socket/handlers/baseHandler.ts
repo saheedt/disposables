@@ -2,6 +2,8 @@ import { default as mongo } from 'mongodb';
 import { hash, compare } from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
+import { UserErrorMesssages } from '../../../constants';
+
 export default class BaseHandler {
 
     isEmptyOrNull(str: string) {
@@ -51,16 +53,17 @@ export default class BaseHandler {
             return null;
         }
     }
-    // supply correct return type after confirming token creation content
-    verifyToken(token: string, secret: string) {
+
+    verifyToken(token: string, secret: string): any {
         try {
             const decoded = jwt.verify(token, secret);
             return decoded;
         } catch (error) {
             console.error('[Error]: ', 'Error verifying token ', error);
-            return 'Invalid token';
+            return UserErrorMesssages.AUTH_INVALID_TOKEN;
         }
     }
+
     clone(data: any) {
         return JSON.parse(JSON.stringify(data));
     }

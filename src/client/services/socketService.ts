@@ -36,6 +36,18 @@ export class SocketService {
         return fromEvent(this.socket, IoStatusEvents.RECONNECT)
     }
 
+    onUserSocketSyncSuccess(): Observable<any> {
+        return fromEvent(this.socket, UserEvents.USER_SOCKET_SYNC_SUCCESS);
+    }
+
+    onUserSocketSyncError(): Observable<any> {
+        return fromEvent(this.socket, UserEvents.USER_SOCKET_SYNC_ERROR);
+    }
+
+    onUserUnAuthorized(): Observable<any> {
+        return fromEvent(this.socket, UserEvents.USER_UNAUTHORIZED)
+    }
+
     send(event: string, data: any): void {
         this.socket.emit(event, data);
     }

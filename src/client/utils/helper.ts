@@ -12,4 +12,12 @@ export default class Helper {
             landscape: "(orientation: landscape)"
         };
     }
+
+    static fetchLocalStorageItem(item: string) {
+        return JSON.parse(localStorage.getItem(item));
+    }
+
+    static removeLocalStorageItem(item: string) {
+        localStorage.removeItem(item);
+    }
 }

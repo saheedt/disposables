@@ -19,9 +19,12 @@ export class SocketController {
     connect(listeners: Listeners): void {
         const userListerner = listeners.UserListener;
         const chatListener = listeners.ChatListener;
+
         this.io.on(IoStatusEvents.CONNECTION, (socket: any) => {
             console.info('connected:', socket.id);
-            socket.on(UserEvents.USER_RECONNECT_DATA, (data: any) => { /*console.log(data)*/ });
+            socket.on(UserEvents.USER_RECONNECT_DATA, (data: any) => {
+                userListerner.handlerInstance.handleReconnection(data, socket);
+             });
             userListerner.listen(socket);
             chatListener.listen(socket);
         });

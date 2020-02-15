@@ -1,34 +1,38 @@
 import socketIo from 'socket.io';
 import { default as mongo } from 'mongodb';
-import uuid from 'uuid/v5';
+import Redis from 'redis';
+// import uuid from 'uuid/v5';
 
-import { DbCollections, UserEvents, UserErrors, StatusCodes } from '../../../constants';
+import { DbCollections, UserEvents, UserErrorMesssages, StatusCodes, IoStatusEvents } from '../../../constants';
 import BaseHandler from './baseHandler';
 
 
 export default class UserHandler extends BaseHandler {
     private dBInstance: mongo.Db;
+    private redisInstance: any;
 
     constructor() {
         super();
     }
 
-    connectDb(dBInstance: mongo.Db): void {
-       this.dBInstance = dBInstance;
+    connectDb(dBInstance: mongo.Db, redisInstance: any): void {
+        this.dBInstance = dBInstance;
+        this.redisInstance = redisInstance;
     }
 
+    // TODO: define expected userData object type..
     async createUser(userData: any, socket: socketIo.EngineSocket) {
         if (this.isEmptyOrNull(userData.email) || !this.isEmail(userData.email)) {
             socket.emit(UserEvents.CREATE_USER_ERROR, {
                 code: StatusCodes.BAD_REQUEST,
-                message: UserErrors.USER_ERROR_CREDENTIALS
+                message: UserErrorMesssages.USER_ERROR_CREDENTIALS
             });
             return;
         }
         if (!this.isValidPassword(userData.password)) {
             socket.emit(UserEvents.CREATE_USER_ERROR, {
                 code: StatusCodes.BAD_REQUEST,
-                message: UserErrors.USER_ERROR_PASSWORD
+                message: UserErrorMesssages.USER_ERROR_PASSWORD
             });
             return;
         }
@@ -40,7 +44,7 @@ export default class UserHandler extends BaseHandler {
                 socket.emit(UserEvents.CREATE_USER_ERROR,
                     {
                         code: StatusCodes.OK,
-                        message: UserErrors.CREATE_USER_ERROR_DUPLICATE_USERNAME
+                        message: UserErrorMesssages.CREATE_USER_ERROR_DUPLICATE_USERNAME
                     });
                 return;
             }
@@ -50,14 +54,16 @@ export default class UserHandler extends BaseHandler {
                 socket.emit(UserEvents.CREATE_USER_ERROR,
                     {
                         code: StatusCodes.INTERNAL_SERVER_ERROR,
-                        message: UserErrors.CREATE_USER_ERROR_SERVER
+                        message: UserErrorMesssages.CREATE_USER_ERROR_SERVER
                     });
                 return;
             }
             const insertRecord = {
                 email: userData.email,
                 userName: userData.userName,
-                password: passwordHash
+                password: passwordHash,
+                friendsList: [] as [],
+                friendRequest: [] as []
             }
             const response = await this.insert(insertRecord, DbCollections.users);
             if (response.result.ok) {
@@ -74,12 +80,18 @@ export default class UserHandler extends BaseHandler {
                     },
                     token
                 });
+                const userSocketSync = await this.redisInstance.setAsync(toToken.userName, socket.id);
+                if (userSocketSync !== "OK") {
+                    socket.emit(UserEvents.USER_SOCKET_SYNC_ERROR);
+                    return;
+                }
+                socket.emit(UserEvents.USER_SOCKET_SYNC_SUCCESS, { user: toToken.userName, socketId: socket.id });
             }
             return;
         }
         socket.emit(UserEvents.CREATE_USER_ERROR, {
             code: StatusCodes.OK,
-            message: UserErrors.CREATE_USER_ERROR_DUPLICATE_EMAIL
+            message: UserErrorMesssages.CREATE_USER_ERROR_DUPLICATE_EMAIL
         })
     }
 
@@ -87,14 +99,14 @@ export default class UserHandler extends BaseHandler {
         if (this.isEmptyOrNull(authData.email) || !this.isEmail(authData.email)) {
             socket.emit(UserEvents.AUTH_USER_ERROR, {
                 code: StatusCodes.BAD_REQUEST,
-                message: UserErrors.USER_ERROR_CREDENTIALS
+                message: UserErrorMesssages.USER_ERROR_CREDENTIALS
             });
             return;
         }
         if (!this.isValidPassword(authData.password)) {
             socket.emit(UserEvents.AUTH_USER_ERROR, {
                 code: StatusCodes.BAD_REQUEST,
-                message: UserErrors.USER_ERROR_CREDENTIALS
+                message: UserErrorMesssages.USER_ERROR_CREDENTIALS
             });
             return;
         }
@@ -104,7 +116,7 @@ export default class UserHandler extends BaseHandler {
             if (!match) {
                 socket.emit(UserEvents.AUTH_USER_ERROR, {
                     code: StatusCodes.BAD_REQUEST,
-                    message: UserErrors.USER_ERROR_CREDENTIALS
+                    message: UserErrorMesssages.USER_ERROR_CREDENTIALS
                 });
                 return;
             }
@@ -117,15 +129,45 @@ export default class UserHandler extends BaseHandler {
                 data: toToken,
                 token
             });
+
+            const userSocketSync = await this.redisInstance.setAsync(toToken.userName, socket.id);
+            if (userSocketSync !== "OK") {
+                socket.emit(UserEvents.USER_SOCKET_SYNC_ERROR);
+                return;
+            }
+            socket.emit(UserEvents.USER_SOCKET_SYNC_SUCCESS, { user: toToken.userName, socketId: socket.id });
             return;
         }
 
         socket.emit(UserEvents.AUTH_USER_ERROR, {
             code: StatusCodes.NOT_FOUND,
-            message: UserErrors.AUTH_USER_ERROR_NON_EXISTENT
+            message: UserErrorMesssages.AUTH_USER_ERROR_NON_EXISTENT
         });
 
     }
+
+    /** */
+
+    async handleReconnection(data: any, socket: socketIo.EngineSocket) {
+        const authorizedUser = this.verifyToken(data.token, process.env.JWT_SECRET);
+        if (authorizedUser === UserErrorMesssages.AUTH_INVALID_TOKEN) {
+            socket.emit(UserEvents.USER_UNAUTHORIZED);
+            return;
+        }
+        const userExists = await this.find({ userName: authorizedUser.userName }, DbCollections.users);
+        if (userExists) {
+            const userSocketSync = await this.redisInstance.setAsync(userExists.userName, socket.id);
+            if (userSocketSync !== "OK") {
+                socket.emit(UserEvents.USER_SOCKET_SYNC_ERROR);
+                return;
+            }
+            socket.emit(UserEvents.USER_SOCKET_SYNC_SUCCESS, { user: userExists.userName, socketId: socket.id });
+            return;
+        }
+        socket.emit(UserEvents.USER_UNAUTHORIZED);
+    }
+
+    /** */
 
     async find(record: any | any[], from: string, isMultiple = false) {
         const collection = this.dBInstance.collection(from);
