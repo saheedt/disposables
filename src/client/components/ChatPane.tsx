@@ -1,6 +1,6 @@
 import React, { FC, useState, useEffect } from 'react';
 
-import { Input, Button, ChatMessage } from '../components';
+import { Button, ChatMessage, Header, Input } from './';
 
 interface PropType {
     incomingMessage: any
@@ -31,6 +31,9 @@ const ChatPane: FC<PropType> = ({ incomingMessage, messageHistory }) => {
 
     return (
         <section className="chat-pane-container">
+            <Header styleClass="chat-pane-header">
+
+            </Header>
             <div className="chat-pane-messages-holder">
                 <ul className="chat-pane-messages">
                     <li> <span className="incoming">Here we display chat</span> </li>

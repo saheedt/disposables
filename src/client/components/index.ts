@@ -8,6 +8,7 @@ import ChatList from './ChatList';
 import ChatListItem from './ChatListItem';
 import ChatPane from './ChatPane';
 import ChatMessage from './ChatMessage';
+import Header from './Header';
 
 export {
     Container,
@@ -19,5 +20,6 @@ export {
     ChatList,
     ChatListItem,
     ChatPane,
-    ChatMessage
+    ChatMessage,
+    Header
 };

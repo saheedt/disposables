@@ -60,5 +60,6 @@ export enum LocalStorageKeys {
 
 export enum ClientRoutes {
     HOME = '/',
-    CHAT = '/chat'
+    CHAT = '/chat',
+    CHATPANE = '/pane'
 }

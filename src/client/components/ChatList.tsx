@@ -1,6 +1,6 @@
 import React, { FC, useState, useEffect } from 'react';
 
-import { ChatListItem } from './';
+import { ChatListItem, Header } from './';
 
 interface PropType {
     friendList: any[],
@@ -25,6 +25,9 @@ const ChatList: FC<PropType> = ({ friendList, match }) => {
 
     return (
         <section className="chat-list-container">
+            <Header styleClass="chat-list-header">
+
+            </Header>
             <ul className="chat-list">
                 <li className="chat-list-item" >Here we list all..</li>
                 {list && list.length > 0 ?

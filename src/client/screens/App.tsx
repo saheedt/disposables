@@ -35,7 +35,6 @@ const App = () => {
                     <Route exact path={`${ClientRoutes.HOME}`} component={Home} />
                     <Route path={`${ClientRoutes.CHAT}`} component={Chat} />
                 </Switch>
-
             </Container>
         </BrowserRouter>
     )

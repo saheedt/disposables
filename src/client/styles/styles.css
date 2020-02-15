@@ -100,12 +100,18 @@ button {
     height: 100vh;
 }
 
-.chat-pane-container {
-    height: 100%;
+.chat-pane-header {
+    width: 100%;
+    height: 10%;
+    max-height: 5rem;
+    flex: 1;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,.1), 0 1px 3px 0 rgba(0,0,0, .06);
 }
 
+
 .chat-pane-messages-holder {
-    height: 90%
+    min-height: 80%;
+    flex: 2;
 }
 
 .chat-pane-messages {
@@ -141,8 +147,9 @@ button {
     display: flex;
     width: 100%;
     height: 10%;
-    bottom: 0;
     align-items: flex-end;
+    max-height: 5rem;
+    flex: 1;
 }
 
 .chat-pane-input-form {
@@ -170,17 +177,33 @@ button {
 
 .chat-pane-container {
     height: 100vh;
-    width: 100%
+    width: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 .chat-list-container {
     height: 100vh;
     background-color: var(--color-white);
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-list-header {
+    width: 100%;
+    height: 10%;
+    max-height: 5rem;
+    background-color: var(--color-background-grey);
+    flex: 1;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,.1), 0 1px 3px 0 rgba(0,0,0, .06);
 }
 
 .chat-list {
     padding: 0 0.5rem;
-    min-height: 100%;
+    min-height: 90%;
+    flex: 2;
+    list-style: none;
+    overflow-y: scroll;
 }
 
 .chat-list-item {
@@ -219,9 +242,6 @@ button {
     .signup-container input {
         margin-top: 0.5rem;
     }
-    .chat-pane-input-form {
-        max-height: 5rem
-    }
 }
 
 /* Medium screen breakpoint */
@@ -238,17 +258,13 @@ button {
         padding: 1.5rem;
     }
     .chat-container {
-        display: flex
+        display: flex;
     }
     .chat-list-container {
         width: 30%
     }
     .chat-pane-container {
         width: 70%
-    }
-
-    .chat-pane-input-form {
-        max-height: 5rem
     }
 }
 
@@ -262,17 +278,12 @@ button {
     }
     .chat-container {
         display: flex
-
     }
     .chat-list-container {
         width: 30%
     }
     .chat-pane-container {
         width: 70%
-    }
-
-    .chat-pane-input-form {
-        max-height: 5rem
     }
 }
 
@@ -295,7 +306,7 @@ button {
         width: 70%
     }
 
-    .chat-pane-input-form {
+    .chat-pane-input-holder  {
         max-height: 10rem
     }
 }

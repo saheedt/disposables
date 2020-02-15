@@ -1,6 +1,10 @@
-import React, { FC, ReactChildren } from 'react';
+import React, { FC } from 'react';
 
-const Container: FC<{children: any}> = ({ children }) => {
+interface PropType {
+    children: any
+}
+
+const Container: FC<PropType> = ({ children }) => {
     return (
         <main className="container">{children}</main>
     )

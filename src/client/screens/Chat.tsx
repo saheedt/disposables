@@ -4,7 +4,7 @@ import Media from 'react-media';
 
 import { ChatList, ChatPane } from '../components';
 
-import { LocalStorageKeys } from '../../constants';
+import { LocalStorageKeys, ClientRoutes } from '../../constants';
 import Helper from '../utils/helper';
 
 const Chat: FC<any> = ({ history, match }) => {
@@ -37,7 +37,7 @@ const Chat: FC<any> = ({ history, match }) => {
                                 <Switch>
                                     <Route
                                         exact
-                                        path={`${match.url}/pane`}
+                                        path={`${match.url}${ClientRoutes.CHATPANE}`}
                                         render={(props) => <ChatPane incomingMessage={null} messageHistory={null} {...props} /> }
                                     />
                                     <Route exact path={`${match.url}`} render={(props) => <ChatList friendList={dummyFriendList} {...props} />} />
@@ -46,9 +46,9 @@ const Chat: FC<any> = ({ history, match }) => {
                             :
                             (
                                 <>
-                                    <Route path={`${match.url}/pane`} render={(props) => <ChatList friendList={dummyFriendList} {...props} />} />
-                                    <Route path={`${match.url}/pane`} render={ (props) => <ChatPane incomingMessage={null} messageHistory={null} {...props} /> } />
-                                    <Redirect from={`${match.url}`} to={`${match.url}/pane`} />
+                                    <Route path={`${match.url}${ClientRoutes.CHATPANE}`} render={(props) => <ChatList friendList={dummyFriendList} {...props} />} />
+                                    <Route path={`${match.url}${ClientRoutes.CHATPANE}`} render={ (props) => <ChatPane incomingMessage={null} messageHistory={null} {...props} /> } />
+                                    <Redirect from={`${match.url}`} to={`${match.url}${ClientRoutes.CHATPANE}`} />
                                 </>
                             )
 
