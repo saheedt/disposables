@@ -9,6 +9,7 @@ import ChatListItem from './ChatListItem';
 import ChatPane from './ChatPane';
 import ChatMessage from './ChatMessage';
 import Header from './Header';
+import SearchModal from './SearchModal';
 
 export {
     Container,
@@ -21,5 +22,6 @@ export {
     ChatListItem,
     ChatPane,
     ChatMessage,
-    Header
+    Header,
+    SearchModal
 };

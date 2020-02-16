@@ -28,9 +28,14 @@ export class SocketController {
             userListerner.listen(socket);
             chatListener.listen(socket);
         });
+        // this.io.sockets.sockets[''].emit()
     }
 
     attachAdapter(adapter: any): void {
         this.io.adapter(adapter);
+    }
+
+    get instance(): socketIo.Server {
+        return this.io
     }
 }

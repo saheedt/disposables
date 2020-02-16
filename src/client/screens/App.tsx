@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from 'react';
 
-import { Route, Switch, useHistory } from "react-router-dom";
+import { Route, Switch, useHistory, useLocation } from "react-router-dom";
 
 import { Chat, Home } from '.'
 import { Container } from '../components';
@@ -12,10 +12,11 @@ import Helper from '../utils/helper';
 const App = () => {
     const context = useContext(SocketContext);
     const history = useHistory();
-    
+    const location = useLocation();
     const reConnectionHandler = () => {
         const userData = Helper.fetchLocalStorageItem(LocalStorageKeys.USER_DATA);
         userData && context.send(UserEvents.USER_RECONNECT_DATA, userData);
+        !userData && location.pathname !== ClientRoutes.HOME && history.push(ClientRoutes.HOME);
     };
 
     const handleUnAuthorizedUser = () => {
@@ -32,12 +33,22 @@ const App = () => {
          *  2. [optional]: validate user credentials and possibly prompt user to Authenticate
          *      if token if expired or do nothing if no token was sent.
          */
-        const reconnectObservable = context.onReconnect();
+        // const reconnectObservable = context.onReconnect();
         const onUserUnAuthorized = context.onUserUnAuthorized();
         const userSocketSyncErrorObservable = context.onUserSocketSyncError();
         const userSocketSyncSuccessObservable = context.onUserSocketSyncSuccess();
 
-        reconnectObservable.subscribe(reConnectionHandler);
+        const newFriendRequest = context.onNewFriendRequest();
+        const friendRequestError = context.onFriendRequestError();
+
+        const onConnection = context.onConnection();
+        onConnection.subscribe(reConnectionHandler);
+
+        newFriendRequest.subscribe((details) => { console.log('new friend reqeust: ', details) });
+        friendRequestError.subscribe(() => console.log('error sending friend request...'));
+
+
+        // reconnectObservable.subscribe(reConnectionHandler);
         onUserUnAuthorized.subscribe(handleUnAuthorizedUser);
         userSocketSyncErrorObservable.subscribe(() => {
             localStorage.removeItem(LocalStorageKeys.USER_DATA);

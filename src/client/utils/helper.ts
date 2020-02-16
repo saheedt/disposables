@@ -20,4 +20,8 @@ export default class Helper {
     static removeLocalStorageItem(item: string) {
         localStorage.removeItem(item);
     }
+
+    static isEmptyOrNull(str: string) {
+        return (!str || /^\s*$/.test(str));
+    }
 }

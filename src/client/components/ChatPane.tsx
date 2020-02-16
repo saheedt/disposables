@@ -1,6 +1,7 @@
 import React, { FC, useState, useEffect } from 'react';
 
 import { Button, ChatMessage, Header, Input } from './';
+import Helper from '../utils/helper';
 
 interface PropType {
     incomingMessage: any
@@ -10,6 +11,15 @@ interface PropType {
 const ChatPane: FC<PropType> = ({ incomingMessage, messageHistory }) => {
 
     const [messages, setMessages] = useState([]);
+    const [currentMessage, setCurrentMessage] = useState('');
+
+    const isEmpty = Helper.isEmptyOrNull(currentMessage);
+
+    const sendMessage = (event: React.FormEvent<HTMLFormElement>): void => {
+        event.preventDefault();
+        console.log('got clicked..')
+
+    };
 
     useEffect(() => {
         setMessages(messageHistory)
@@ -47,13 +57,13 @@ const ChatPane: FC<PropType> = ({ incomingMessage, messageHistory }) => {
                 </ul>
             </div>
             <div className="chat-pane-input-holder">
-                <form className="chat-pane-input-form" onSubmit={()=>{}}>
+                <form className="chat-pane-input-form" onSubmit={sendMessage}>
                     <Input
                         label="Chat input"
                         placeholder="Type a message"
-
+                        extractValue={setCurrentMessage}
                     />
-                    <Button text="send" />
+                    <Button disabled={isEmpty} text="send" />
                 </form>
             </div>
         </section>

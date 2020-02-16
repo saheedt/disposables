@@ -11,7 +11,7 @@ export default class UserListerner implements Listener {
     constructor(handler: UserHandler) {
         this.handler = handler;
     }
-    
+
     get handlerInstance(): UserHandler {
         return this.handler;
     }
@@ -19,8 +19,10 @@ export default class UserListerner implements Listener {
     listen(socket: socketIo.EngineSocket): void {
         socket.on(UserEvents.CREATE_USER, (user: any) => this.handler.createUser(user, socket));
         socket.on(UserEvents.AUTH_USER, (user: any) => this.handler.authenticateUser(user, socket));
+        socket.on(UserEvents.USER_SEARCH, (searchTerm: any) => this.handler.userSearch(searchTerm, socket));
+        socket.on(UserEvents.SEND_FRIEND_REQUEST, (data: any) => this.handler.friendRequest(data, socket))
         socket.on('disconnect', (reason: any) => {
             console.log('server disonnect reason: ', reason);
-         });
+        });
     }
 }

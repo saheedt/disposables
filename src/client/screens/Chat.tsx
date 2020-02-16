@@ -1,5 +1,5 @@
 import React, { FC, Fragment, useEffect, useState } from 'react';
-import { Route, Redirect, Switch } from 'react-router-dom';
+import { Route, Redirect, Switch, useHistory } from 'react-router-dom';
 import Media from 'react-media';
 
 import { ChatList, ChatPane } from '../components';
@@ -7,9 +7,9 @@ import { ChatList, ChatPane } from '../components';
 import { LocalStorageKeys, ClientRoutes } from '../../constants';
 import Helper from '../utils/helper';
 
-const Chat: FC<any> = ({ history, match }) => {
-    const [chatView, setChatView] = useState(false);
-
+const Chat: FC<any> = ({ match }) => {
+    const [message, setMessage] = useState('');
+    const history = useHistory();
     useEffect(() => {
         const localUserData = localStorage.getItem(LocalStorageKeys.USER_DATA);
         !localUserData && history.push('/');

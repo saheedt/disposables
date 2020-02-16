@@ -12,9 +12,15 @@
     box-sizing: border-box;
     border: 0;
 }
+
 a {
     text-decoration: none;
 }
+
+li {
+    list-style: none;
+}
+
 .container {
     width: 100vw;
     min-height: 100vh;
@@ -117,7 +123,6 @@ button {
 .chat-pane-messages {
     height: 100%;
     padding: 1rem;
-    list-style: none;
     overflow-y: scroll;
 }
 
@@ -196,6 +201,20 @@ button {
     background-color: var(--color-background-grey);
     flex: 1;
     box-shadow: 0 1px 2px 0 rgba(0,0,0,.1), 0 1px 3px 0 rgba(0,0,0, .06);
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-list-header-child-top, .chat-list-header-child-bottom {
+    height: 50%;
+    width: 100%;
+    padding: 0 0.5rem;
+
+}
+
+.chat-list-header-child-bottom button {
+    height: 90%;
+    width: 3rem;
 }
 
 .chat-list {
@@ -212,6 +231,44 @@ button {
     padding: 0.5rem 0.5rem
 }
 
+.search-modal-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem
+}
+
+.search-modal-input-holder {
+    width: 70%;
+    display: flex;
+    margin-top: 1rem;
+}
+.search-modal-input-holder input {
+    height: 3rem;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,.1), 0 1px 3px 0 rgba(0,0,0,.06);
+}
+.search-modal-input-holder form {
+    width: 100%;
+}
+.search-modal-result-holder {
+    width: 70%;
+    margin-top: 1rem;
+}
+.search-modal-result-holder ul {
+    overflow-y: scroll;
+}
+.search-modal-result-item {
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 0.5rem
+}
+.search-modal-result-item button {
+    width: 5rem;
+    height: 80%;
+}
 /* Small screen breakpoint */
 @media only screen and (max-width: 719px) {
     .auth-intro-text{
@@ -241,6 +298,15 @@ button {
     }
     .signup-container input {
         margin-top: 0.5rem;
+    }
+    .search-modal-container {
+        padding: 0;
+    }
+    .search-modal-container h1 {
+        font-size: 1.5rem;
+    }
+    .search-modal-input-holder{
+        width: 100%
     }
 }
 

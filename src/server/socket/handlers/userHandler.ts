@@ -10,9 +10,11 @@ import BaseHandler from './baseHandler';
 export default class UserHandler extends BaseHandler {
     private dBInstance: mongo.Db;
     private redisInstance: any;
+    private socketServerInstance: socketIo.Server
 
-    constructor() {
+    constructor(socketServerInstance: socketIo.Server) {
         super();
+        this.socketServerInstance = socketServerInstance;
     }
 
     connectDb(dBInstance: mongo.Db, redisInstance: any): void {
@@ -80,7 +82,7 @@ export default class UserHandler extends BaseHandler {
                     },
                     token
                 });
-                const userSocketSync = await this.redisInstance.setAsync(toToken.userName, socket.id);
+                const userSocketSync = await this.redisInstance.setAsync(toToken._id.toString(), socket.id);
                 if (userSocketSync !== "OK") {
                     socket.emit(UserEvents.USER_SOCKET_SYNC_ERROR);
                     return;
@@ -130,7 +132,7 @@ export default class UserHandler extends BaseHandler {
                 token
             });
 
-            const userSocketSync = await this.redisInstance.setAsync(toToken.userName, socket.id);
+            const userSocketSync = await this.redisInstance.setAsync(toToken._id.toString(), socket.id);
             if (userSocketSync !== "OK") {
                 socket.emit(UserEvents.USER_SOCKET_SYNC_ERROR);
                 return;
@@ -148,38 +150,109 @@ export default class UserHandler extends BaseHandler {
 
     /** */
 
-    async handleReconnection(data: any, socket: socketIo.EngineSocket) {
+    async userVerifiedAndExists(data: any, socket: socketIo.EngineSocket) {
         const authorizedUser = this.verifyToken(data.token, process.env.JWT_SECRET);
         if (authorizedUser === UserErrorMesssages.AUTH_INVALID_TOKEN) {
-            socket.emit(UserEvents.USER_UNAUTHORIZED);
-            return;
+            socket.emit(UserEvents.USER_UNAUTHORIZED, {
+                code: StatusCodes.UNAUTHORIZED,
+                message: UserErrorMesssages.USER_UNAUTHORIZED
+            });
+            return {verified: false};
         }
-        const userExists = await this.find({ userName: authorizedUser.userName }, DbCollections.users);
+        const userExists = await this.find({ _id: new mongo.ObjectID(authorizedUser._id) }, DbCollections.users);
         if (userExists) {
-            const userSocketSync = await this.redisInstance.setAsync(userExists.userName, socket.id);
+            socket.emit(UserEvents.USER_AUTHORIZED)
+            return { verified: true, user: userExists };
+        }
+        socket.emit(UserEvents.USER_UNAUTHORIZED);
+        return { verified: false };
+    }
+
+    async handleReconnection(data: any, socket: socketIo.EngineSocket) {
+        const verifiedAndExists = await this.userVerifiedAndExists(data, socket);
+        if (verifiedAndExists.verified) {
+            const userSocketSync = await this.redisInstance.setAsync(verifiedAndExists.user._id.toString(), socket.id);
             if (userSocketSync !== "OK") {
                 socket.emit(UserEvents.USER_SOCKET_SYNC_ERROR);
                 return;
             }
-            socket.emit(UserEvents.USER_SOCKET_SYNC_SUCCESS, { user: userExists.userName, socketId: socket.id });
+            socket.emit(UserEvents.USER_SOCKET_SYNC_SUCCESS, { user: verifiedAndExists.user.userName, socketId: socket.id });
             return;
         }
-        socket.emit(UserEvents.USER_UNAUTHORIZED);
+    }
+
+    async friendRequest(data: any, socket: socketIo.EngineSocket) {
+        const verifiedAndExists = await this.userVerifiedAndExists(data.requestInitiator, socket);
+        if (verifiedAndExists.verified) {
+            const toRequestee = {
+                filter: { _id: new mongo.ObjectID(data.friendId) },
+                update: { $push: { friendRequest: { requester: data.requestInitiator.data._id } } },
+            };
+
+            const toRequester = {
+                filter: { _id: new mongo.ObjectID(data.requestInitiator.data._id) },
+                update: { $push: { friendsList: { friendId: data.friendId } } }
+            };
+
+            const sendToRequestee = await this.findAndUpdate(toRequestee, DbCollections.users);
+            if (sendToRequestee) {
+                const sendToRequester = await this.findAndUpdate(toRequester, DbCollections.users);
+                if (sendToRequester) {
+                    const requesteeSocketId = await this.redisInstance.getAsync(data.friendId);
+                    this.socketServerInstance.to(requesteeSocketId).emit(UserEvents.NEW_FRIEND_REQUEST, {
+                            friendId: data.requestInitiator.data._id,
+                            userName: data.requestInitiator.data.userName
+                    });
+                    return;
+                }
+                // error adding to requester list.
+                // should silently fail since requestee is notified ?
+                socket.emit(UserEvents.FRIEND_REQUEST_ERROR);
+                return;
+            }
+            socket.emit(UserEvents.FRIEND_REQUEST_ERROR);
+            return;
+            // error performing friend request
+        }
     }
 
     /** */
+    // change incoming to include current user _id to compare items
+    async userSearch(record: any, socket: socketIo.EngineSocket) {
+        const textQuery = { $text: { $search: record.searchTerm }};
+        const result = await this.find(textQuery, DbCollections.users, true);
+        const processed = result.length > 0 ?
+            result.map((item: any) => {
+                delete item.password;
+                return item
+            }).filter((item: any) => item._id.toString() !== record.user_id )
+            : []
+        socket.emit(UserEvents.USER_SEARCH_RESPONSE, { response: processed});
+    }
 
     async find(record: any | any[], from: string, isMultiple = false) {
         const collection = this.dBInstance.collection(from);
         let result;
         try {
             if (isMultiple) {
-                return result = await collection.find(record);
+                result = await collection.find(record);
+                return result.toArray();
             }
             return result = collection.findOne(record);
         } catch (error) {
             console.error('[Error]: Find error ', error);
-            return error;
+            return null;
+        }
+    }
+
+    async findAndUpdate(record: any, from: string) {
+        const collection = this.dBInstance.collection(from);
+        try {
+            const result = await collection.findOneAndUpdate(record.filter, record.update);
+            return result;
+        } catch (error) {
+            console.log('[Error]: FindOneAndUpdate error ', error);
+            return null;
         }
     }
 
@@ -193,7 +266,8 @@ export default class UserHandler extends BaseHandler {
             return result = await collection.insertOne(record);
         } catch (error) {
             console.error('[Error]: Insert error ', error);
-            return error
+            return null;
         }
     }
+
  }

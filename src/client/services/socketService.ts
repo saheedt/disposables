@@ -1,6 +1,8 @@
 import io from 'socket.io-client';
 import { fromEvent, Observable } from 'rxjs';
 
+
+
 import { IoStatusEvents, ChatEvents, UserEvents } from '../../constants';
 
 export class SocketService {
@@ -10,6 +12,10 @@ export class SocketService {
         console.log('opening socket in client');
         this.socket = io(`localhost:${port}`);
         return this;
+    }
+
+    onConnection(): Observable<any> {
+        return fromEvent(this.socket, 'connect');
     }
     // SUpply appropriate types..
     onMessage(): Observable<any> {
@@ -46,6 +52,22 @@ export class SocketService {
 
     onUserUnAuthorized(): Observable<any> {
         return fromEvent(this.socket, UserEvents.USER_UNAUTHORIZED)
+    }
+
+    onUserSearchResponse(): Observable<any> {
+        return fromEvent(this.socket, UserEvents.USER_SEARCH_RESPONSE);
+    }
+
+    // onAddUserToListSuccess(): Observable<any> {
+    //     return fromEvent(this.socket, UserEvents.ADD_USER_TO_LIST_SUCCESS);
+    // }
+
+    onNewFriendRequest(): Observable<any> {
+        return fromEvent(this.socket, UserEvents.NEW_FRIEND_REQUEST);
+    }
+
+    onFriendRequestError(): Observable<any> {
+        return fromEvent(this.socket, UserEvents.FRIEND_REQUEST_ERROR);
     }
 
     send(event: string, data: any): void {

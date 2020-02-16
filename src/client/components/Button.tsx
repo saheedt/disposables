@@ -4,11 +4,12 @@ interface PropType {
     text: string,
     externalStyle?: string,
     handleClick?: any,
+    disabled?: boolean
 }
 
-const Button: FC<PropType> = ({ text, externalStyle, handleClick}) => {
+const Button: FC<PropType> = ({ disabled, externalStyle, handleClick, text }) => {
     return (
-        <button className={`button ${externalStyle}`} onClick={handleClick}>
+        <button className={`button ${externalStyle}`} disabled={disabled} onClick={handleClick}>
             {text}
         </button>
     )

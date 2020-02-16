@@ -1,6 +1,6 @@
 import React, { FC, useState, useEffect } from 'react';
 
-import { ChatListItem, Header } from './';
+import { Button, ChatListItem, Header, SearchModal } from './';
 
 interface PropType {
     friendList: any[],
@@ -8,6 +8,11 @@ interface PropType {
 }
 const ChatList: FC<PropType> = ({ friendList, match }) => {
     const [list, setList] = useState([]);
+    const [isModalOpen, setIsModalOpen] = useState(false)
+
+    const handleAddUserModalToggle = () => {
+        setIsModalOpen(!isModalOpen);
+    }
 
     useEffect(() => {
         setList(friendList);
@@ -26,7 +31,11 @@ const ChatList: FC<PropType> = ({ friendList, match }) => {
     return (
         <section className="chat-list-container">
             <Header styleClass="chat-list-header">
-
+                <div className="chat-list-header-child-top"></div>
+                <div className="chat-list-header-child-bottom">
+                    <Button handleClick={handleAddUserModalToggle} text="add" />
+                    <SearchModal isOpen={isModalOpen} toggleModal={handleAddUserModalToggle}/>
+                </div>
             </Header>
             <ul className="chat-list">
                 <li className="chat-list-item" >Here we list all..</li>
