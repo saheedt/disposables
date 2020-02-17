@@ -1,6 +1,6 @@
 import React, { FC, useState, useEffect } from 'react';
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { Button, ChatListItem, Header, SearchModal } from './';
 
@@ -33,10 +33,10 @@ const ChatList: FC<PropType> = ({ friendList, match }) => {
     return (
         <section className="chat-list-container">
             <Header styleClass="chat-list-header">
-                <div className="chat-list-header-child-top"></div>
-                <div className="chat-list-header-child-bottom">
+                <div className="chat-view-header-child-top"></div>
+                <div className="chat-view-header-child-bottom">
                     <Button handleClick={handleAddUserModalToggle}>
-                        <FontAwesomeIcon className="user-add-font" icon="user-plus"/>
+                        <FontAwesomeIcon className="user-add-font general-icon-font" icon="user-plus"/>
                     </Button>
                     <SearchModal isOpen={isModalOpen} toggleModal={handleAddUserModalToggle}/>
                 </div>

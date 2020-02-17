@@ -5,6 +5,7 @@
     --color-purple: #d9a9ff;
     --color-almost-black: #090d10;
     --color-black: #000000;
+    --color-red: #fc8181;
 }
 *, :before, :after {
     margin: 0;
@@ -205,11 +206,16 @@ button {
     flex-direction: column;
 }
 
-.chat-list-header-child-top, .chat-list-header-child-bottom {
+.chat-view-header-child-top, .chat-view-header-child-bottom {
     height: 50%;
     width: 100%;
     padding: 0 0.5rem;
 
+}
+
+.chat-pane-header-child-top{
+    display: flex;
+    justify-content: flex-end;
 }
 
 .chat-list-header-child-bottom button {
@@ -273,7 +279,75 @@ button {
 
 .user-add-font {
     color: var(--color-almost-black);
+
+}
+.general-icon-font {
     font-size: 1.25rem;
+}
+
+.new_friend_request {
+    color: var(--color-green);
+}
+/* Dropdown styles */
+.dropdown {
+    display: inline-block;
+}
+
+.dropdown__content {
+    display: none;
+    position: absolute;
+    margin-left: -15rem;
+}
+
+.dropdown--active .dropdown__content {
+    display: block;
+}
+/* Dropdown styles */
+.chat-pane-friend-rqst-bell {
+    height: 100%;
+    width: 5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.friend-requests-holder {
+    height: 15rem;
+    width: 15rem;
+    background-color: var(--color-white);
+    padding: 1rem;
+}
+
+.friend-requests-holder h1 {
+    text-align: center;
+}
+
+.friend-requests-holder ul {
+    margin-top: 1rem;
+    overflow-y: scroll;
+}
+
+.friend-requests-holder ul li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--color-background-grey);
+    padding: 0.5rem;
+}
+
+ .friend-requests-holder ul li span {
+     font-weight: bolder;
+    font-size: 1.2rem;
+ }
+
+.friend-requests-holder ul li button{
+    height: 2rem;
+    width: 3rem;
+}
+.accept {
+    background-color: var(--color-green);
+}
+.reject {
+    background-color: var(--color-red);
 }
 /* Small screen breakpoint */
 @media only screen and (max-width: 719px) {

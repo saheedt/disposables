@@ -33,6 +33,7 @@
     "react-media": "^1.10.0",
     "react-modal": "^3.11.1",
     "react-router-dom": "^5.1.2",
+    "react-simple-dropdown": "^3.2.3",
     "redis": "^2.8.0",
     "rxjs": "^6.5.4",
     "socket.io": "^2.3.0",

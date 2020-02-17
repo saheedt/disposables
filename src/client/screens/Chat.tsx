@@ -1,4 +1,4 @@
-import React, { FC, Fragment, useEffect, useState } from 'react';
+import React, { FC, useContext, useEffect, useState } from 'react';
 import { Route, Redirect, Switch, useHistory } from 'react-router-dom';
 import Media from 'react-media';
 
@@ -6,13 +6,35 @@ import { ChatList, ChatPane } from '../components';
 
 import { LocalStorageKeys, ClientRoutes } from '../../constants';
 import Helper from '../utils/helper';
+import { SocketContext } from '../context/socketContext';
 
 const Chat: FC<any> = ({ match }) => {
     const [message, setMessage] = useState('');
+    const [friendRequests, setFriendRequests] = useState({
+        friendRequests: [],
+        newRequest: false
+    });
     const history = useHistory();
+    const context = useContext(SocketContext);
     useEffect(() => {
-        const localUserData = localStorage.getItem(LocalStorageKeys.USER_DATA);
+        const localUserData = Helper.fetchLocalStorageItem(LocalStorageKeys.USER_DATA);
         !localUserData && history.push('/');
+
+        const newFriendRequest = context.onNewFriendRequest();
+
+        newFriendRequest.subscribe((details) => {
+            console.log('new friend reqeust: ', details);
+            const pendingRequests = Helper.fetchLocalStorageItem(LocalStorageKeys.FRIEND_REQUESTS);
+            if (!pendingRequests) {
+                const newRequest = [details];
+                Helper.addToLocalStorage(LocalStorageKeys.FRIEND_REQUESTS, newRequest);
+                setFriendRequests({ friendRequests: newRequest, newRequest: true})
+                return;
+            }
+            pendingRequests.unshift(details);
+            Helper.addToLocalStorage(LocalStorageKeys.FRIEND_REQUESTS, pendingRequests);
+            setFriendRequests({ friendRequests: pendingRequests, newRequest: true })
+        });
     }, []);
     const dummyFriendList = [
         { userName: 'aubama-bloodclot-yang' },
@@ -47,7 +69,9 @@ const Chat: FC<any> = ({ match }) => {
                             (
                                 <>
                                     <Route path={`${match.url}${ClientRoutes.CHATPANE}`} render={(props) => <ChatList friendList={dummyFriendList} {...props} />} />
-                                    <Route path={`${match.url}${ClientRoutes.CHATPANE}`} render={ (props) => <ChatPane incomingMessage={null} messageHistory={null} {...props} /> } />
+                                    <Route path={`${match.url}${ClientRoutes.CHATPANE}`} render={
+                                        (props) => <ChatPane incomingMessage={null} messageHistory={null} friendRequests={friendRequests} {...props} />
+                                    } />
                                     <Redirect from={`${match.url}`} to={`${match.url}${ClientRoutes.CHATPANE}`} />
                                 </>
                             )

@@ -10,6 +10,8 @@ import ChatPane from './ChatPane';
 import ChatMessage from './ChatMessage';
 import Header from './Header';
 import SearchModal from './SearchModal';
+import DropDown from './DropDown';
+import FriendRequests from './FriendRequests';
 
 export {
     Container,
@@ -23,5 +25,7 @@ export {
     ChatPane,
     ChatMessage,
     Header,
-    SearchModal
+    SearchModal,
+    DropDown,
+    FriendRequests
 };

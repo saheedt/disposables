@@ -1,14 +1,15 @@
 import React, { FC, useState, useEffect } from 'react';
 
-import { Button, ChatMessage, Header, Input } from './';
+import { Button, ChatMessage, Header, Input, FriendRequests } from './';
 import Helper from '../utils/helper';
 
 interface PropType {
     incomingMessage: any
     messageHistory: any
+    friendRequests?: any
 }
 
-const ChatPane: FC<PropType> = ({ incomingMessage, messageHistory }) => {
+const ChatPane: FC<PropType> = ({ incomingMessage, messageHistory, friendRequests }) => {
 
     const [messages, setMessages] = useState([]);
     const [currentMessage, setCurrentMessage] = useState('');
@@ -42,7 +43,13 @@ const ChatPane: FC<PropType> = ({ incomingMessage, messageHistory }) => {
     return (
         <section className="chat-pane-container">
             <Header styleClass="chat-pane-header">
-
+                <div className="chat-view-header-child-top chat-pane-header-child-top">
+                    <div className="chat-pane-friend-rqst-bell">
+                        <FriendRequests friendRequests={friendRequests}/>
+                    </div>
+                </div>
+                <div className="chat-view-header-child-bottom">
+                </div>
             </Header>
             <div className="chat-pane-messages-holder">
                 <ul className="chat-pane-messages">
