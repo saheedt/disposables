@@ -18,6 +18,10 @@
   "author": "Saheed Ajibulu",
   "license": "ISC",
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.27",
+    "@fortawesome/free-regular-svg-icons": "^5.12.1",
+    "@fortawesome/free-solid-svg-icons": "^5.12.1",
+    "@fortawesome/react-fontawesome": "^0.1.8",
     "bcrypt": "^3.0.8",
     "bluebird": "^3.7.2",
     "dotenv": "^8.2.0",

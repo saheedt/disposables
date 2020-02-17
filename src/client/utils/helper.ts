@@ -21,6 +21,10 @@ export default class Helper {
         localStorage.removeItem(item);
     }
 
+    static addToLocalStorage(key: string, item: any) {
+        localStorage.setItem(key, JSON.stringify(item));
+    }
+
     static isEmptyOrNull(str: string) {
         return (!str || /^\s*$/.test(str));
     }

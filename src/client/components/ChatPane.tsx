@@ -63,7 +63,9 @@ const ChatPane: FC<PropType> = ({ incomingMessage, messageHistory }) => {
                         placeholder="Type a message"
                         extractValue={setCurrentMessage}
                     />
-                    <Button disabled={isEmpty} text="send" />
+                    <Button disabled={isEmpty}>
+                        send
+                    </Button>
                 </form>
             </div>
         </section>

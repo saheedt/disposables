@@ -205,14 +205,11 @@ export default class UserHandler extends BaseHandler {
                     });
                     return;
                 }
-                // error adding to requester list.
-                // should silently fail since requestee is notified ?
                 socket.emit(UserEvents.FRIEND_REQUEST_ERROR);
                 return;
             }
             socket.emit(UserEvents.FRIEND_REQUEST_ERROR);
             return;
-            // error performing friend request
         }
     }
 

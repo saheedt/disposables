@@ -68,7 +68,9 @@ const SearchModal = ({ isOpen, toggleModal}: any) => {
         return response.map((item, index: number) => (
             <li key={`${index}_usr_search`} className="search-modal-result-item">
                 <span>{item.userName}</span>
-                <Button text="Add" handleClick={sendFriendRequest(item._id)}/>
+                <Button handleClick={sendFriendRequest(item._id)}>
+                    Add
+                </Button>
             </li>
         ));
     };

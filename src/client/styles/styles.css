@@ -215,6 +215,7 @@ button {
 .chat-list-header-child-bottom button {
     height: 90%;
     width: 3rem;
+    background-color: var(--color-background-grey);
 }
 
 .chat-list {
@@ -268,6 +269,11 @@ button {
 .search-modal-result-item button {
     width: 5rem;
     height: 80%;
+}
+
+.user-add-font {
+    color: var(--color-almost-black);
+    font-size: 1.25rem;
 }
 /* Small screen breakpoint */
 @media only screen and (max-width: 719px) {

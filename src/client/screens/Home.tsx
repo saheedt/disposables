@@ -1,25 +1,28 @@
 import React, { Fragment, useState, useContext, useEffect } from 'react';
 
+import { useHistory } from 'react-router-dom';
+
 import { SocketContext } from '../context/socketContext';
 import { Login, SignUp, SubContainer, Button } from '../components';
 import Helper from '../utils/helper';
 
 import { ClientRoutes, LocalStorageKeys } from '../../constants';
 
-const Home = ({history}: any) => {
+const Home = () => {
     const [authType, setAuthType] = useState('Login');
     const [buttonText, setButtonText] = useState('Sign Up');
     const context = useContext(SocketContext);
+    const history = useHistory();
 
     const handleAuthSuccess = (userData: any) => {
         try {
-            const localData = localStorage.getItem(LocalStorageKeys.USER_DATA);
+            const localData = Helper.fetchLocalStorageItem(LocalStorageKeys.USER_DATA);
             if (localData) {
-                localStorage.removeItem(LocalStorageKeys.USER_DATA);
+                Helper.removeLocalStorageItem(LocalStorageKeys.USER_DATA);
             }
             const dataClone = Helper.clone(userData);
             delete dataClone.code;
-            localStorage.setItem(LocalStorageKeys.USER_DATA, JSON.stringify(dataClone));
+            Helper.addToLocalStorage(LocalStorageKeys.USER_DATA, dataClone);
             history.push(ClientRoutes.CHAT);
         } catch (error) {
             // Temporarily log error, but should implement
@@ -93,7 +96,7 @@ const Home = ({history}: any) => {
                         {renderAuthComponent()}
                     </div>
                     <div className="auth-switch-holder">
-                        <span>{whichComponent(buttonText)}</span> | <Button text={buttonText} handleClick={switchHandler} />
+                        <span>{whichComponent(buttonText)}</span> | <Button handleClick={switchHandler}>{buttonText}</Button>
                     </div>
                 </Fragment>
             </SubContainer>

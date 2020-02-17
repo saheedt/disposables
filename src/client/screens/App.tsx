@@ -13,6 +13,7 @@ const App = () => {
     const context = useContext(SocketContext);
     const history = useHistory();
     const location = useLocation();
+    
     const reConnectionHandler = () => {
         const userData = Helper.fetchLocalStorageItem(LocalStorageKeys.USER_DATA);
         userData && context.send(UserEvents.USER_RECONNECT_DATA, userData);
@@ -44,7 +45,17 @@ const App = () => {
         const onConnection = context.onConnection();
         onConnection.subscribe(reConnectionHandler);
 
-        newFriendRequest.subscribe((details) => { console.log('new friend reqeust: ', details) });
+        newFriendRequest.subscribe((details) => {
+            console.log('new friend reqeust: ', details);
+            const pendingRequests = Helper.fetchLocalStorageItem(LocalStorageKeys.FRIEND_REQUESTS);
+            if (!pendingRequests) {
+                const newRequest = [details];
+                Helper.addToLocalStorage(LocalStorageKeys.FRIEND_REQUESTS, newRequest);
+                return;
+            }
+            pendingRequests.unshift(details);
+            Helper.addToLocalStorage(LocalStorageKeys.FRIEND_REQUESTS, pendingRequests);
+        });
         friendRequestError.subscribe(() => console.log('error sending friend request...'));
 
 

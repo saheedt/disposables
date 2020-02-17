@@ -68,7 +68,8 @@ export enum DbCollections {
 }
 
 export enum LocalStorageKeys {
-    USER_DATA = 'dspsbl__usr'
+    USER_DATA = 'dspsbl__usr',
+    FRIEND_REQUESTS = 'dspsbl__frndreqs'
 }
 
 export enum ClientRoutes {

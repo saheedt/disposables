@@ -12,11 +12,8 @@ export default class UserListerner implements Listener {
         this.handler = handler;
     }
 
-    get handlerInstance(): UserHandler {
-        return this.handler;
-    }
-
     listen(socket: socketIo.EngineSocket): void {
+        socket.on(UserEvents.USER_RECONNECT_DATA, (data: any) => this.handler.handleReconnection(data, socket));
         socket.on(UserEvents.CREATE_USER, (user: any) => this.handler.createUser(user, socket));
         socket.on(UserEvents.AUTH_USER, (user: any) => this.handler.authenticateUser(user, socket));
         socket.on(UserEvents.USER_SEARCH, (searchTerm: any) => this.handler.userSearch(searchTerm, socket));
