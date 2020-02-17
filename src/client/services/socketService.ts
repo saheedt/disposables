@@ -66,8 +66,20 @@ export class SocketService {
         return fromEvent(this.socket, UserEvents.NEW_FRIEND_REQUEST);
     }
 
+    onFriendRequestAccepted(): Observable<any> {
+        return fromEvent(this.socket, UserEvents.FRIEND_REQUEST_ACCEPTED)
+    }
+
     onFriendRequestError(): Observable<any> {
         return fromEvent(this.socket, UserEvents.FRIEND_REQUEST_ERROR);
+    }
+
+    onFetchFriendRequestsSuccess(): Observable<any> {
+        return fromEvent(this.socket, UserEvents.FETCH_FRIEND_REQUESTS_SUCCESS);
+    }
+
+    onFetchFriendsListSuccess(): Observable<any> {
+        return fromEvent(this.socket, UserEvents.FETCH_FRIENDS_LIST_SUCCESS);
     }
 
     send(event: string, data: any): void {

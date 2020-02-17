@@ -4,7 +4,7 @@ import Media from 'react-media';
 
 import { ChatList, ChatPane } from '../components';
 
-import { LocalStorageKeys, ClientRoutes } from '../../constants';
+import { LocalStorageKeys, ClientRoutes, UserEvents } from '../../constants';
 import Helper from '../utils/helper';
 import { SocketContext } from '../context/socketContext';
 
@@ -14,13 +14,22 @@ const Chat: FC<any> = ({ match }) => {
         friendRequests: [],
         newRequest: false
     });
+    const [friendsList, setFriendsList] = useState([]);
+
     const history = useHistory();
     const context = useContext(SocketContext);
     useEffect(() => {
         const localUserData = Helper.fetchLocalStorageItem(LocalStorageKeys.USER_DATA);
         !localUserData && history.push('/');
 
+        context.send(UserEvents.FETCH_FRIENDS_LIST,
+            Helper.fetchLocalStorageItem(LocalStorageKeys.USER_DATA));
+
         const newFriendRequest = context.onNewFriendRequest();
+
+        const onFriendRequestAccepted = context.onFriendRequestAccepted();
+        const onFriendRequestError = context.onFriendRequestError();
+        const onFriendsList = context.onFetchFriendsListSuccess();
 
         newFriendRequest.subscribe((details) => {
             console.log('new friend reqeust: ', details);
@@ -35,14 +44,24 @@ const Chat: FC<any> = ({ match }) => {
             Helper.addToLocalStorage(LocalStorageKeys.FRIEND_REQUESTS, pendingRequests);
             setFriendRequests({ friendRequests: pendingRequests, newRequest: true })
         });
+
+        onFriendRequestAccepted.subscribe((response) => {
+            console.log('friend request accepted: ', response);
+            context.send(UserEvents.FETCH_FRIENDS_LIST,
+                Helper.fetchLocalStorageItem(LocalStorageKeys.USER_DATA));
+        });
+        /**implement toast notification for both (/\ \/) */
+        onFriendRequestError.subscribe((response) => {
+            console.log('friend request error: ', response);
+            context.send(UserEvents.FETCH_FRIENDS_LIST, Helper.fetchLocalStorageItem(LocalStorageKeys.USER_DATA))
+         });
+
+        onFriendsList.subscribe((friendsList) => {
+            console.log('fetched friends list: ', friendsList);
+            setFriendsList(friendsList.friendsList);
+        });
+
     }, []);
-    const dummyFriendList = [
-        { userName: 'aubama-bloodclot-yang' },
-        { userName: 'Lacazette' },
-        { userName: 'Hectizee' },
-        { userName: 'M10Mesut' },
-        { userName: 'kolasinac' },
-    ];
 
     // const handleItemCLick = (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
     //     event.preventDefault();
@@ -62,13 +81,13 @@ const Chat: FC<any> = ({ match }) => {
                                         path={`${match.url}${ClientRoutes.CHATPANE}`}
                                         render={(props) => <ChatPane incomingMessage={null} messageHistory={null} {...props} /> }
                                     />
-                                    <Route exact path={`${match.url}`} render={(props) => <ChatList friendList={dummyFriendList} {...props} />} />
+                                    <Route exact path={`${match.url}`} render={(props) => <ChatList friendList={friendsList} {...props} />} />
                                 </Switch>
                             )
                             :
                             (
                                 <>
-                                    <Route path={`${match.url}${ClientRoutes.CHATPANE}`} render={(props) => <ChatList friendList={dummyFriendList} {...props} />} />
+                                    <Route path={`${match.url}${ClientRoutes.CHATPANE}`} render={(props) => <ChatList friendList={friendsList} {...props} />} />
                                     <Route path={`${match.url}${ClientRoutes.CHATPANE}`} render={
                                         (props) => <ChatPane incomingMessage={null} messageHistory={null} friendRequests={friendRequests} {...props} />
                                     } />

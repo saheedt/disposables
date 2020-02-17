@@ -45,7 +45,7 @@ const ChatPane: FC<PropType> = ({ incomingMessage, messageHistory, friendRequest
             <Header styleClass="chat-pane-header">
                 <div className="chat-view-header-child-top chat-pane-header-child-top">
                     <div className="chat-pane-friend-rqst-bell">
-                        <FriendRequests friendRequests={friendRequests}/>
+                        <FriendRequests newFriendRequests={friendRequests}/>
                     </div>
                 </div>
                 <div className="chat-view-header-child-bottom">

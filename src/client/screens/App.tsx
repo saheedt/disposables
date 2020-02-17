@@ -39,25 +39,9 @@ const App = () => {
         const userSocketSyncErrorObservable = context.onUserSocketSyncError();
         const userSocketSyncSuccessObservable = context.onUserSocketSyncSuccess();
 
-        // const newFriendRequest = context.onNewFriendRequest();
-        const friendRequestError = context.onFriendRequestError();
 
         const onConnection = context.onConnection();
         onConnection.subscribe(reConnectionHandler);
-
-        // newFriendRequest.subscribe((details) => {
-        //     console.log('new friend reqeust: ', details);
-        //     const pendingRequests = Helper.fetchLocalStorageItem(LocalStorageKeys.FRIEND_REQUESTS);
-        //     if (!pendingRequests) {
-        //         const newRequest = [details];
-        //         Helper.addToLocalStorage(LocalStorageKeys.FRIEND_REQUESTS, newRequest);
-        //         return;
-        //     }
-        //     pendingRequests.unshift(details);
-        //     Helper.addToLocalStorage(LocalStorageKeys.FRIEND_REQUESTS, pendingRequests);
-        // });
-        friendRequestError.subscribe(() => console.log('error sending friend request...'));
-
 
         // reconnectObservable.subscribe(reConnectionHandler);
         onUserUnAuthorized.subscribe(handleUnAuthorizedUser);

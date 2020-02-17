@@ -164,7 +164,10 @@ export default class UserHandler extends BaseHandler {
             socket.emit(UserEvents.USER_AUTHORIZED)
             return { verified: true, user: userExists };
         }
-        socket.emit(UserEvents.USER_UNAUTHORIZED);
+        socket.emit(UserEvents.USER_UNAUTHORIZED, {
+            code: StatusCodes.UNAUTHORIZED,
+            message: UserErrorMesssages.USER_UNAUTHORIZED
+        });
         return { verified: false };
     }
 
@@ -186,7 +189,7 @@ export default class UserHandler extends BaseHandler {
         if (verifiedAndExists.verified) {
             const toRequestee = {
                 filter: { _id: new mongo.ObjectID(data.friendId) },
-                update: { $push: { friendRequest: { requester: data.requestInitiator.data._id } } },
+                update: { $push: { friendRequest: { requester: data.requestInitiator.data._id } } }
             };
 
             const toRequester = {
@@ -205,16 +208,115 @@ export default class UserHandler extends BaseHandler {
                     });
                     return;
                 }
-                socket.emit(UserEvents.FRIEND_REQUEST_ERROR);
+                socket.emit(UserEvents.FRIEND_REQUEST_ERROR, {
+                    code: StatusCodes.INTERNAL_SERVER_ERROR,
+                    message: UserErrorMesssages.FRIEND_REQUEST_ERROR
+                });
                 return;
             }
-            socket.emit(UserEvents.FRIEND_REQUEST_ERROR);
+            socket.emit(UserEvents.FRIEND_REQUEST_ERROR, {
+                code: StatusCodes.INTERNAL_SERVER_ERROR,
+                message: UserErrorMesssages.FRIEND_REQUEST_ERROR
+            });
+            return;
+        }
+    }
+
+    async acceptFriendRequest(data: any, socket: socketIo.EngineSocket) {
+        const verifiedAndExists = await this.userVerifiedAndExists(data.userData, socket);
+        if (verifiedAndExists.verified) {
+            const removeFromRequestList = {
+                filter: { _id: new mongo.ObjectID(verifiedAndExists.user._id) },
+                update: { $pull: { friendRequest: { requester: data.friendId } } }
+            };
+
+            const addToFriendsList = {
+                filter: { _id: new mongo.ObjectID(verifiedAndExists.user._id) },
+                update: { $push: { friendsList: { friendId: data.friendId } } }
+            };
+
+            const removeFromRequest = await this.findAndUpdate(removeFromRequestList, DbCollections.users);
+            if (removeFromRequest) {
+                const addToFriends = await this.findAndUpdate(addToFriendsList, DbCollections.users);
+                if (addToFriends) {
+                    socket.emit(UserEvents.FRIEND_REQUEST_ACCEPTED, {
+                        code: StatusCodes.OK
+                    });
+                    const requesterSocketId = await this.redisInstance.getAsync(data.friendId);
+                    this.socketServerInstance.to(requesterSocketId).emit(UserEvents.FRIEND_REQUEST_ACCEPTED, {
+                        code: StatusCodes.OK,
+                        by: verifiedAndExists.user.userName
+                    });
+                    return;
+                }
+                // add to friend list error
+                socket.emit(UserEvents.FRIEND_REQUEST_ERROR, {
+                    code: StatusCodes.INTERNAL_SERVER_ERROR,
+                    message: UserErrorMesssages.FRIEND_REQUEST_ERROR
+                });
+                return;
+            }
+            // removal from friend request error
+            socket.emit(UserEvents.FRIEND_REQUEST_ERROR, {
+                code: StatusCodes.INTERNAL_SERVER_ERROR,
+                message: UserErrorMesssages.FRIEND_REQUEST_ERROR
+            });
+            return;
+        }
+    }
+
+    async fetchFriendRequests(data: any, socket: socketIo.EngineSocket) {
+        const verifiedAndExists = await this.userVerifiedAndExists(data, socket);
+        if (verifiedAndExists.verified) {
+            const friendRequests = verifiedAndExists.user.friendRequest.length > 0 && verifiedAndExists.user.friendRequest
+                .map((friend: { [friendId: string]: string }) => (new mongo.ObjectID(friend.friendId)));
+
+            if (friendRequests.length > 0) {
+                const isBulkFetch = true;
+                const query = { _id: { $in: friendRequests } };
+                const all = await this.find(query, DbCollections.users, isBulkFetch);
+                const processed = all.map((user: any) => ({ friendId: user._id, userName: user.userName }));
+                socket.emit(UserEvents.FETCH_FRIEND_REQUESTS_SUCCESS, {
+                    code: StatusCodes.OK,
+                    friendRequests: processed
+                });
+                return;
+            }
+            socket.emit(UserEvents.FETCH_FRIEND_REQUESTS_SUCCESS, {
+                code: StatusCodes.OK,
+                friendRequests: []
+            });
+            return;
+        }
+    }
+
+    async fetchFriendsList(data: any, socket: socketIo.EngineSocket) {
+        const verifiedAndExists = await this.userVerifiedAndExists(data, socket);
+        if (verifiedAndExists.verified) {
+            const friendsList = verifiedAndExists.user.friendsList.length > 0 && verifiedAndExists.user.friendsList
+                .map((friend: { [friendId: string]: string }) => ( new mongo.ObjectID(friend.friendId) ));
+
+            if (friendsList.length > 0) {
+                const isBulkFetch = true;
+                const query = { _id: { $in: friendsList}};
+                const all = await this.find(query, DbCollections.users, isBulkFetch);
+                const processed = all.map((user: any) => ({_id: user._id, userName: user.userName}));
+                socket.emit(UserEvents.FETCH_FRIENDS_LIST_SUCCESS, {
+                    code: StatusCodes.OK,
+                    friendsList: processed
+                });
+                return;
+            }
+            socket.emit(UserEvents.FETCH_FRIENDS_LIST_SUCCESS, {
+                code: StatusCodes.OK,
+                friendsList: []
+            });
             return;
         }
     }
 
     /** */
-    // change incoming to include current user _id to compare items
+    // Do not return self on search, hence the filter..
     async userSearch(record: any, socket: socketIo.EngineSocket) {
         const textQuery = { $text: { $search: record.searchTerm }};
         const result = await this.find(textQuery, DbCollections.users, true);
