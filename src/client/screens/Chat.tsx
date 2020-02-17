@@ -79,7 +79,7 @@ const Chat: FC<any> = ({ match }) => {
                                     <Route
                                         exact
                                         path={`${match.url}${ClientRoutes.CHATPANE}`}
-                                        render={(props) => <ChatPane incomingMessage={null} messageHistory={null} {...props} /> }
+                                        render={(props) => <ChatPane incomingMessage={null} messageHistory={null} friendRequests={friendRequests} {...props} /> }
                                     />
                                     <Route exact path={`${match.url}`} render={(props) => <ChatList friendList={friendsList} {...props} />} />
                                 </Switch>
