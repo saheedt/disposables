@@ -49,7 +49,6 @@ const Chat: FC<any> = ({ match }) => {
             setFriendRequests({ friendRequests: pendingRequests, newRequest: true });
             addToast(Helper.frMessage(details.userName, FrStatus.NEW), {appearance: ToastAppearances.INFO});
         });
-        /**implement toast notification for all friend request events */
         onFriendRequestAccepted.subscribe((response) => {
             console.log('friend request accepted: ', response);
             if (response.by) {

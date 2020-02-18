@@ -50,7 +50,7 @@ const App = () => {
             history.push(ClientRoutes.HOME);
         });
         userSocketSyncSuccessObservable.subscribe((data) => {
-            console.log('current data on sync success: ', data);
+            // console.log('current data on sync success: ', data);
         });
     }, []);
 

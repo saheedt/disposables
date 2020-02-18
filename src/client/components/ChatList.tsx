@@ -24,6 +24,7 @@ const ChatList: FC<PropType> = ({ friendList, match }) => {
         return list.map((item, index) => (
             <ChatListItem
                 key={`${item.userName}__${index}`}
+                id={item._id}
                 userName={item.userName}
                 match={match}
             />
