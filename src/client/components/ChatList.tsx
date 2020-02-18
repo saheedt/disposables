@@ -6,9 +6,10 @@ import { Button, ChatListItem, Header, SearchModal } from './';
 
 interface PropType {
     friendList: any[],
+    selectChat: any,
     match: any
 }
-const ChatList: FC<PropType> = ({ friendList, match }) => {
+const ChatList: FC<PropType> = ({ friendList, selectChat, match }) => {
     const [list, setList] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false)
 
@@ -26,6 +27,7 @@ const ChatList: FC<PropType> = ({ friendList, match }) => {
                 key={`${item.userName}__${index}`}
                 id={item._id}
                 userName={item.userName}
+                selectChat={selectChat}
                 match={match}
             />
         ));

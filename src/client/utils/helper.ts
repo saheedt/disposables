@@ -36,4 +36,14 @@ export default class Helper {
         }
         return `${person.toUpperCase()} ${status} your friend request`;
     }
+
+    static sortAlphanumInAsc(...args: string[]) {
+        const clone = Helper.clone(args);
+        clone.sort((a: any, b: any) => a.localeCompare(b, 'en', { sensitivity: 'base' }));
+        return clone;
+    };
+
+    static genChatId(userId1: string, userId2: string) {
+        return Helper.sortAlphanumInAsc(userId1, userId2).join('<>');
+    }
 }

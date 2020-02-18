@@ -10,7 +10,9 @@ import Helper from '../utils/helper';
 import { SocketContext } from '../context/socketContext';
 
 const Chat: FC<any> = ({ match }) => {
-    const [message, setMessage] = useState('');
+    const [messages, setMessages] = useState([]);
+    const [currentChat, setCurrentChat] = useState([]);
+    const [currentChatId, setCurrentChatId] = useState(null);
     const [friendRequests, setFriendRequests] = useState({
         friendRequests: [],
         newRequest: false
@@ -19,97 +21,116 @@ const Chat: FC<any> = ({ match }) => {
 
     const history = useHistory();
     const context = useContext(SocketContext);
-    const { addToast } = useToasts()
+    const { addToast } = useToasts();
+    const {
+        addToLocalStorage,
+        fetchLocalStorageItem,
+        frMessage,
+        genChatId,
+        routeMediaQueries
+    } = Helper;
+    const { FRIEND_LIST, FRIEND_REQUESTS, IMS, USER_DATA } = LocalStorageKeys;
 
     useEffect(() => {
-        const localUserData = Helper.fetchLocalStorageItem(LocalStorageKeys.USER_DATA);
+        const localUserData = fetchLocalStorageItem(USER_DATA);
         !localUserData && history.push('/');
 
-        context.send(UserEvents.FETCH_FRIENDS_LIST,
-            Helper.fetchLocalStorageItem(LocalStorageKeys.USER_DATA));
+        context.send(UserEvents.FETCH_FRIENDS_LIST, fetchLocalStorageItem(USER_DATA));
 
         const newFriendRequest = context.onNewFriendRequest();
 
-        const onFriendRequestAccepted = context.onFriendRequestAccepted();
-        const onFriendRequestRejected = context.onFriendRequestRejected();
-        const onFriendRequestError = context.onFriendRequestError();
+        const friendRequestAccepted = context.onFriendRequestAccepted();
+        const friendRequestRejected = context.onFriendRequestRejected();
+        const friendRequestError = context.onFriendRequestError();
         const onFriendsList = context.onFetchFriendsListSuccess();
 
         newFriendRequest.subscribe((details) => {
             console.log('new friend reqeust: ', details);
-            const pendingRequests = Helper.fetchLocalStorageItem(LocalStorageKeys.FRIEND_REQUESTS);
+            const pendingRequests = fetchLocalStorageItem(FRIEND_REQUESTS);
             if (!pendingRequests) {
                 const newRequest = [details];
-                Helper.addToLocalStorage(LocalStorageKeys.FRIEND_REQUESTS, newRequest);
+                addToLocalStorage(FRIEND_REQUESTS, newRequest);
                 setFriendRequests({ friendRequests: newRequest, newRequest: true})
                 return;
             }
             pendingRequests.unshift(details);
-            Helper.addToLocalStorage(LocalStorageKeys.FRIEND_REQUESTS, pendingRequests);
+            addToLocalStorage(FRIEND_REQUESTS, pendingRequests);
             setFriendRequests({ friendRequests: pendingRequests, newRequest: true });
-            addToast(Helper.frMessage(details.userName, FrStatus.NEW), {appearance: ToastAppearances.INFO});
+            addToast(frMessage(details.userName, FrStatus.NEW), {appearance: ToastAppearances.INFO});
         });
-        onFriendRequestAccepted.subscribe((response) => {
+
+        friendRequestAccepted.subscribe((response) => {
             console.log('friend request accepted: ', response);
             if (response.by) {
-                addToast(Helper.frMessage(response.by, FrStatus.ACCEPTED), {
+                addToast(frMessage(response.by, FrStatus.ACCEPTED), {
                     appearance: ToastAppearances.SUCCESS
                 });
             }
-            context.send(UserEvents.FETCH_FRIENDS_LIST,
-                Helper.fetchLocalStorageItem(LocalStorageKeys.USER_DATA));
+            context.send(UserEvents.FETCH_FRIENDS_LIST, fetchLocalStorageItem(USER_DATA));
         });
-        onFriendRequestRejected.subscribe((response) => {
+
+        friendRequestRejected.subscribe((response) => {
             console.log('friend request rejected: ', response);
             if (response.by) {
-                addToast(Helper.frMessage(response.by, FrStatus.REJECTED), {
+                addToast(frMessage(response.by, FrStatus.REJECTED), {
                     appearance: ToastAppearances.ERROR
                 });
             }
             context.send(UserEvents.FETCH_FRIENDS_LIST,
-                Helper.fetchLocalStorageItem(LocalStorageKeys.USER_DATA));
-         });
-        onFriendRequestError.subscribe((response) => {
+                fetchLocalStorageItem(USER_DATA));
+        });
+
+        friendRequestError.subscribe((response) => {
             console.log('friend request error: ', response);
             addToast(response.message, { appearance: ToastAppearances.ERROR });
-            context.send(UserEvents.FETCH_FRIENDS_LIST, Helper.fetchLocalStorageItem(LocalStorageKeys.USER_DATA))
+            context.send(UserEvents.FETCH_FRIENDS_LIST, fetchLocalStorageItem(USER_DATA))
          });
 
         onFriendsList.subscribe((friendsList) => {
             console.log('fetched friends list: ', friendsList);
             setFriendsList(friendsList.friendsList);
+            addToLocalStorage(FRIEND_LIST, friendsList.friendsList);
         });
-
     }, []);
 
-    // const handleItemCLick = (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
-    //     event.preventDefault();
-    //     setChatView(!chatView);
-    // };
+    const selectChat = (firstUserId: string, SecondUserId: string) => {
+        const chatId = genChatId(firstUserId, SecondUserId);
+        const allIms = fetchLocalStorageItem(IMS);
+        if (!allIms) {
+            const newMessage: any = [{ [`${chatId}`]: [] }];
+            addToLocalStorage(IMS, newMessage);
+            setMessages(newMessage);
+            setCurrentChat(newMessage[0][chatId]);
+            setCurrentChatId(chatId);
+            return;
+        }
+        const selected = allIms.find((item: any) => Object.keys(item)[0] === chatId);
+        console.log('selected chat: ', selected);
+        setCurrentChat(selected[chatId]);
+        setCurrentChatId(chatId);
+    };
 
     return (
         <section className="chat-container">
-            <Media query={Helper.routeMediaQueries.mobile}>
+            <Media query={routeMediaQueries.mobile}>
                 {
                     mobile =>
                         mobile ?
                             (
                                 <Switch>
-                                    <Route
-                                        exact
-                                        path={`${match.url}${ClientRoutes.CHATPANE}`}
-                                        render={(props) => <ChatPane incomingMessage={null} messageHistory={null} friendRequests={friendRequests} {...props} /> }
+                                    <Route path={`${match.url}`} render={(props) => <ChatList friendList={friendsList} selectChat={selectChat} {...props} />} />
+                                    <Route path={`${match.url}${ClientRoutes.CHATPANE}`} render={
+                                        (props) => <ChatPane chatId={currentChatId} friendRequests={friendRequests} selectedChat={currentChat} {...props} />}
                                     />
-                                    <Route exact path={`${match.url}`} render={(props) => <ChatList friendList={friendsList} {...props} />} />
                                 </Switch>
                             )
                             :
                             (
                                 <>
-                                    <Route path={`${match.url}${ClientRoutes.CHATPANE}`} render={(props) => <ChatList friendList={friendsList} {...props} />} />
+                                    <Route path={`${match.url}${ClientRoutes.CHATPANE}`} render={(props) => <ChatList friendList={friendsList} selectChat={selectChat} {...props} />} />
                                     <Route path={`${match.url}${ClientRoutes.CHATPANE}`} render={
-                                        (props) => <ChatPane incomingMessage={null} messageHistory={null} friendRequests={friendRequests} {...props} />
-                                    } />
+                                        (props) => <ChatPane chatId={currentChatId} friendRequests={friendRequests} selectedChat={currentChat} {...props} />}
+                                    />
                                     <Redirect from={`${match.url}`} to={`${match.url}${ClientRoutes.CHATPANE}`} />
                                 </>
                             )

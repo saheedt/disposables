@@ -81,7 +81,9 @@ export enum DbCollections {
 
 export enum LocalStorageKeys {
     USER_DATA = 'dspsbl__usr',
-    FRIEND_REQUESTS = 'dspsbl__frndreqs'
+    FRIEND_REQUESTS = 'dspsbl__frndreqs',
+    FRIEND_LIST = 'dspsbl__frndslst',
+    IMS = 'dspsbl__-ims-__'
 }
 
 export enum ClientRoutes {
