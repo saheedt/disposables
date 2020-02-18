@@ -18,6 +18,10 @@ a {
     text-decoration: none;
 }
 
+a, a:visited, a:hover, a:active {
+    color: inherit;
+}
+
 li {
     list-style: none;
 }
