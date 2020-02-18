@@ -15,18 +15,31 @@ const FriendRequests: FC<PropType> = ({ newFriendRequests }) => {
     const [visualNotification, setVisualNotification] = useState(false);
     const context = useContext(SocketContext);
 
+    const removeFromRequests = (friendId: string) => {
+        const requests = Helper.fetchLocalStorageItem(LocalStorageKeys.FRIEND_REQUESTS);
+        const rest = requests.filter((request: any) => request.friendId !== friendId);
+        Helper.addToLocalStorage(LocalStorageKeys.FRIEND_REQUESTS, rest);
+        setAllRequests(rest);
+        setVisualNotification(!visualNotification);
+    }
+
     const acceptRequest = (friendId: string) => {
         const data = {
             friendId,
             userData: Helper.fetchLocalStorageItem(LocalStorageKeys.USER_DATA)
         };
         context.send(UserEvents.ACCEPT_FRIEND_REQUEST, data);
-        const requests = Helper.fetchLocalStorageItem(LocalStorageKeys.FRIEND_REQUESTS);
-        const rest = requests.filter((request: any) => request.friendId !== friendId);
-        Helper.addToLocalStorage(LocalStorageKeys.FRIEND_REQUESTS, rest);
-        setAllRequests(rest);
-        setVisualNotification(!visualNotification);
+        removeFromRequests(friendId);
     };
+
+    const rejectRequest = (friendId: string) => {
+        const data = {
+            friendId,
+            userData: Helper.fetchLocalStorageItem(LocalStorageKeys.USER_DATA)
+        };
+        context.send(UserEvents.REJECT_FRIEND_REQUEST, data);
+        removeFromRequests(friendId);
+     };
 
     useEffect(() => {
         console.log('fetching friend requests...')
@@ -36,7 +49,9 @@ const FriendRequests: FC<PropType> = ({ newFriendRequests }) => {
             Helper.fetchLocalStorageItem(LocalStorageKeys.USER_DATA));
 
         onFriendRequestsFetch.subscribe((requests) => {
-            setAllRequests(requests);
+            console.log('and i fetched..', requests);
+            Helper.addToLocalStorage(LocalStorageKeys.FRIEND_REQUESTS, requests.friendRequests)
+            setAllRequests(requests.friendRequests);
          });
     }, []);
 
@@ -49,9 +64,8 @@ const FriendRequests: FC<PropType> = ({ newFriendRequests }) => {
     }, [newFriendRequests.friendRequests]);
 
     const renderFriendRequests = () => {
-        console.log('newFriendRequests.friendRequests: ', newFriendRequests.friendRequests)
         const requests = allRequests;
-            // Helper.fetchLocalStorageItem(LocalStorageKeys.FRIEND_REQUESTS);
+
         if (requests && requests.length > 0) {
             return requests.map((item: any, index: number) => (
                 <li key={`frdrqst_-_${index}`}>
@@ -59,7 +73,7 @@ const FriendRequests: FC<PropType> = ({ newFriendRequests }) => {
                     <Button externalStyle="accept" handleClick={() => acceptRequest(item.friendId)}>
                         Accept
                     </Button>
-                    <Button externalStyle="reject">
+                    <Button externalStyle="reject" handleClick={() => rejectRequest(item.friendId)}>
                         Reject
                     </Button>
                 </li>

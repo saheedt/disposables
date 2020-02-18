@@ -239,14 +239,12 @@ export default class UserHandler extends BaseHandler {
             if (removeFromRequest) {
                 const addToFriends = await this.findAndUpdate(addToFriendsList, DbCollections.users);
                 if (addToFriends) {
-                    socket.emit(UserEvents.FRIEND_REQUEST_ACCEPTED, {
-                        code: StatusCodes.OK
-                    });
                     const requesterSocketId = await this.redisInstance.getAsync(data.friendId);
                     this.socketServerInstance.to(requesterSocketId).emit(UserEvents.FRIEND_REQUEST_ACCEPTED, {
                         code: StatusCodes.OK,
                         by: verifiedAndExists.user.userName
                     });
+                    socket.emit(UserEvents.FRIEND_REQUEST_ACCEPTED, { code: StatusCodes.OK });
                     return;
                 }
                 // add to friend list error
@@ -262,6 +260,46 @@ export default class UserHandler extends BaseHandler {
                 message: UserErrorMesssages.FRIEND_REQUEST_ERROR
             });
             return;
+        }
+    }
+
+    async rejectFriendRequest(data: any, socket: socketIo.EngineSocket) {
+        const verifiedAndExists = await this.userVerifiedAndExists(data.userData, socket);
+        if (verifiedAndExists.verified) {
+            const removeFromRequestList = {
+                filter: { _id: new mongo.ObjectID(verifiedAndExists.user._id) },
+                update: { $pull: { friendRequest: { requester: data.friendId } } }
+            };
+
+            const removeFromRequesterFriendsList = {
+                filter: { _id: new mongo.ObjectID(data.friendId) },
+                update: { $pull: { friendsList: { friendId: new mongo.ObjectID(verifiedAndExists.user._id) } } }
+            };
+
+            const removeFromRequest = await this.findAndUpdate(removeFromRequestList, DbCollections.users);
+            if (removeFromRequest) {
+                const removeFromRequesterFriends = await this.findAndUpdate(removeFromRequesterFriendsList, DbCollections.users);
+                if (removeFromRequesterFriends) {
+                    const requesterSocketId = await this.redisInstance.getAsync(data.friendId);
+                    this.socketServerInstance.to(requesterSocketId).emit(UserEvents.FRIEND_REQUEST_REJECTED, {
+                        code: StatusCodes.OK,
+                        by: verifiedAndExists.user.userName
+                    });
+                    socket.emit(UserEvents.FRIEND_REQUEST_REJECTED, { code: StatusCodes.OK });
+                    return;
+                }
+                // emit error rejecting request notification
+                socket.emit(UserEvents.FRIEND_REQUEST_ERROR, {
+                    code: StatusCodes.INTERNAL_SERVER_ERROR,
+                    message: UserErrorMesssages.FRIEND_REQUEST_ERROR
+                });
+                return;
+            }
+            // emit error rejecting request notification
+            socket.emit(UserEvents.FRIEND_REQUEST_ERROR, {
+                code: StatusCodes.INTERNAL_SERVER_ERROR,
+                message: UserErrorMesssages.FRIEND_REQUEST_ERROR
+            });
         }
     }
 

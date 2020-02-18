@@ -1,10 +1,11 @@
 import React, { FC, useContext, useEffect, useState } from 'react';
 import { Route, Redirect, Switch, useHistory } from 'react-router-dom';
 import Media from 'react-media';
+import { useToasts } from 'react-toast-notifications'
 
 import { ChatList, ChatPane } from '../components';
 
-import { LocalStorageKeys, ClientRoutes, UserEvents } from '../../constants';
+import { ClientRoutes, FrStatus, LocalStorageKeys, ToastAppearances, UserEvents } from '../../constants';
 import Helper from '../utils/helper';
 import { SocketContext } from '../context/socketContext';
 
@@ -18,6 +19,8 @@ const Chat: FC<any> = ({ match }) => {
 
     const history = useHistory();
     const context = useContext(SocketContext);
+    const { addToast } = useToasts()
+
     useEffect(() => {
         const localUserData = Helper.fetchLocalStorageItem(LocalStorageKeys.USER_DATA);
         !localUserData && history.push('/');
@@ -28,6 +31,7 @@ const Chat: FC<any> = ({ match }) => {
         const newFriendRequest = context.onNewFriendRequest();
 
         const onFriendRequestAccepted = context.onFriendRequestAccepted();
+        const onFriendRequestRejected = context.onFriendRequestRejected();
         const onFriendRequestError = context.onFriendRequestError();
         const onFriendsList = context.onFetchFriendsListSuccess();
 
@@ -42,17 +46,33 @@ const Chat: FC<any> = ({ match }) => {
             }
             pendingRequests.unshift(details);
             Helper.addToLocalStorage(LocalStorageKeys.FRIEND_REQUESTS, pendingRequests);
-            setFriendRequests({ friendRequests: pendingRequests, newRequest: true })
+            setFriendRequests({ friendRequests: pendingRequests, newRequest: true });
+            addToast(Helper.frMessage(details.userName, FrStatus.NEW), {appearance: ToastAppearances.INFO});
         });
-
+        /**implement toast notification for all friend request events */
         onFriendRequestAccepted.subscribe((response) => {
             console.log('friend request accepted: ', response);
+            if (response.by) {
+                addToast(Helper.frMessage(response.by, FrStatus.ACCEPTED), {
+                    appearance: ToastAppearances.SUCCESS
+                });
+            }
             context.send(UserEvents.FETCH_FRIENDS_LIST,
                 Helper.fetchLocalStorageItem(LocalStorageKeys.USER_DATA));
         });
-        /**implement toast notification for both (/\ \/) */
+        onFriendRequestRejected.subscribe((response) => {
+            console.log('friend request rejected: ', response);
+            if (response.by) {
+                addToast(Helper.frMessage(response.by, FrStatus.REJECTED), {
+                    appearance: ToastAppearances.ERROR
+                });
+            }
+            context.send(UserEvents.FETCH_FRIENDS_LIST,
+                Helper.fetchLocalStorageItem(LocalStorageKeys.USER_DATA));
+         });
         onFriendRequestError.subscribe((response) => {
             console.log('friend request error: ', response);
+            addToast(response.message, { appearance: ToastAppearances.ERROR });
             context.send(UserEvents.FETCH_FRIENDS_LIST, Helper.fetchLocalStorageItem(LocalStorageKeys.USER_DATA))
          });
 

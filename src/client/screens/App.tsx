@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from 'react';
-
 import { Route, Switch, useHistory, useLocation } from "react-router-dom";
+import { ToastProvider } from 'react-toast-notifications'
 
 import { Chat, Home } from '.'
 import { Container } from '../components';
@@ -55,12 +55,14 @@ const App = () => {
     }, []);
 
     return (
-        <Container>
-            <Switch>
-                <Route exact path={`${ClientRoutes.HOME}`} component={Home} />
-                <Route path={`${ClientRoutes.CHAT}`} component={Chat} />
-            </Switch>
-        </Container>
+        <ToastProvider>
+            <Container>
+                <Switch>
+                    <Route exact path={`${ClientRoutes.HOME}`} component={Home} />
+                    <Route path={`${ClientRoutes.CHAT}`} component={Chat} />
+                </Switch>
+            </Container>
+        </ToastProvider>
     )
 }
 

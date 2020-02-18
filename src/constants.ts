@@ -32,10 +32,13 @@ export enum UserEvents {
     SEND_FRIEND_REQUEST = 'send_friend_request',
     FRIEND_REQUEST_ERROR = 'friend_request_error',
     NEW_FRIEND_REQUEST = 'new_friend_request',
+
     FETCH_FRIEND_REQUESTS = 'fetch_friend_requests',
     FETCH_FRIEND_REQUESTS_SUCCESS = 'fetch_friend_requests_success',
+
     ACCEPT_FRIEND_REQUEST = 'accept_friend_request',
     REJECT_FRIEND_REQUEST = 'reject_friend_request',
+
     FRIEND_REQUEST_ACCEPTED = 'friend_request_accepted',
     FRIEND_REQUEST_REJECTED = 'friend_request_rejected',
 }
@@ -85,4 +88,17 @@ export enum ClientRoutes {
     HOME = '/',
     CHAT = '/chat',
     CHATPANE = '/pane'
+}
+
+export enum ToastAppearances {
+    SUCCESS = 'success',
+    ERROR = 'error',
+    WARNING = 'warning',
+    INFO = 'info'
+}
+
+export enum FrStatus {
+    ACCEPTED = 'accepted',
+    REJECTED = 'rejected',
+    NEW = 'new'
 }

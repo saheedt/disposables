@@ -58,16 +58,16 @@ export class SocketService {
         return fromEvent(this.socket, UserEvents.USER_SEARCH_RESPONSE);
     }
 
-    // onAddUserToListSuccess(): Observable<any> {
-    //     return fromEvent(this.socket, UserEvents.ADD_USER_TO_LIST_SUCCESS);
-    // }
-
     onNewFriendRequest(): Observable<any> {
         return fromEvent(this.socket, UserEvents.NEW_FRIEND_REQUEST);
     }
 
     onFriendRequestAccepted(): Observable<any> {
         return fromEvent(this.socket, UserEvents.FRIEND_REQUEST_ACCEPTED)
+    }
+
+    onFriendRequestRejected(): Observable<any> {
+        return fromEvent(this.socket, UserEvents.FRIEND_REQUEST_REJECTED)
     }
 
     onFriendRequestError(): Observable<any> {

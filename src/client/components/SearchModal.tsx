@@ -33,7 +33,6 @@ const SearchModal = ({ isOpen, toggleModal}: any) => {
 
     searchTerm.pipe(debounce(() => interval(800)))
         .subscribe((term) => {
-            console.log(term)
             context.send('user_search', {
                 user_id: currentUser.data._id,
                 searchTerm: term

@@ -1,3 +1,4 @@
+import { FrStatus } from '../../constants'
 export default class Helper {
     static clone(data: any) {
         return JSON.parse(JSON.stringify(data));
@@ -27,5 +28,12 @@ export default class Helper {
 
     static isEmptyOrNull(str: string) {
         return (!str || /^\s*$/.test(str));
+    }
+
+    static frMessage(person: string, status: string): string {
+        if (status === FrStatus.NEW) {
+            return `${person.toUpperCase()} sent a friend request`;
+        }
+        return `${person.toUpperCase()} ${status} your friend request`;
     }
 }
