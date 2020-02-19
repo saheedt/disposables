@@ -40,7 +40,6 @@ const ChatPane: FC<PropType> = ({ chatId, friendRequests, incoming, selectedChat
             timestamp: timeStamp()
         };
         console.log('outgoing: ', outgoing);
-        // return;
         const msgClone = clone(messages);
         msgClone.push(outgoing);
         setMessages(msgClone);
@@ -111,7 +110,7 @@ const ChatPane: FC<PropType> = ({ chatId, friendRequests, incoming, selectedChat
                         [...renderChatMessages()]
                         :
                         <li className="chat-pane-default-message">
-                            <span className="author">Le beginning 😁</span>
+                            <span className="">Le beginning 😁</span>
                         </li>
                     }
                 </ul>

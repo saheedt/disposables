@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { ClientRoutes, LocalStorageKeys } from '../../constants';
 import Helper from '../utils/helper';
 import { SocketContext } from '../context/socketContext';
+import { Subscription } from 'rxjs';
 
 interface PropType {
     id: string,
@@ -22,11 +23,15 @@ const ChatListItem: FC<PropType> = ({ id, match, selectChat, userName }) => {
     const onMessage = context.onMessage();
 
     useEffect(() => {
-        onMessage.subscribe((im) => {
+        const subscriptions: Subscription = new Subscription();
+        subscriptions.add(onMessage.subscribe((im) => {
             if (im.from === id) {
                 setIsNewMessage(true);
             }
-        });
+        }));
+        return () => {
+            subscriptions.unsubscribe();
+        }
     }, []);
 
     const handleClick = (event: React.MouseEvent<HTMLLIElement, MouseEvent>) => {

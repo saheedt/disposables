@@ -6,6 +6,7 @@
     --color-almost-black: #090d10;
     --color-black: #000000;
     --color-red: #fc8181;
+    --color-lighter-green: #e3f9de;
 }
 *, :before, :after {
     margin: 0;
@@ -139,12 +140,17 @@ button {
 
 .chat-pane-messages .author {
     float: right;
+    background-color: var(--color-lighter-green);
 }
 
 .chat-pane-messages li {
     width: 100%;
     min-height: 2.5rem;
     margin-top: 0.5rem;
+}
+
+.chat-pane-default-message {
+    text-align: center;
 }
 
 .author, .incoming {

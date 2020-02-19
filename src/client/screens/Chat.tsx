@@ -1,7 +1,8 @@
 import React, { FC, useContext, useEffect, useState } from 'react';
 import { Route, Redirect, Switch, useHistory } from 'react-router-dom';
 import Media from 'react-media';
-import { useToasts } from 'react-toast-notifications'
+import { useToasts } from 'react-toast-notifications';
+import { Subscription } from 'rxjs';
 
 import { ChatList, ChatPane } from '../components';
 
@@ -34,6 +35,7 @@ const Chat: FC<any> = ({ match }) => {
     const { FRIEND_LIST, FRIEND_REQUESTS, IMS, USER_DATA } = LocalStorageKeys;
 
     useEffect(() => {
+        const subscriptions: Subscription = new Subscription();
         const localUserData = fetchLocalStorageItem(USER_DATA);
         !localUserData && history.push('/');
 
@@ -47,7 +49,7 @@ const Chat: FC<any> = ({ match }) => {
         const onFriendsList = context.onFetchFriendsListSuccess();
         const onMessage = context.onMessage();
 
-        newFriendRequest.subscribe((details) => {
+        subscriptions.add(newFriendRequest.subscribe((details) => {
             console.log('new friend reqeust: ', details);
             const pendingRequests = fetchLocalStorageItem(FRIEND_REQUESTS);
             if (!pendingRequests) {
@@ -60,9 +62,9 @@ const Chat: FC<any> = ({ match }) => {
             addToLocalStorage(FRIEND_REQUESTS, pendingRequests);
             setFriendRequests({ friendRequests: pendingRequests, newRequest: true });
             addToast(frMessage(details.userName, FrStatus.NEW), {appearance: ToastAppearances.INFO});
-        });
+        }));
 
-        friendRequestAccepted.subscribe((response) => {
+        subscriptions.add(friendRequestAccepted.subscribe((response) => {
             console.log('friend request accepted: ', response);
             if (response.by) {
                 addToast(frMessage(response.by, FrStatus.ACCEPTED), {
@@ -70,9 +72,9 @@ const Chat: FC<any> = ({ match }) => {
                 });
             }
             context.send(UserEvents.FETCH_FRIENDS_LIST, fetchLocalStorageItem(USER_DATA));
-        });
+        }));
 
-        friendRequestRejected.subscribe((response) => {
+        subscriptions.add(friendRequestRejected.subscribe((response) => {
             console.log('friend request rejected: ', response);
             if (response.by) {
                 addToast(frMessage(response.by, FrStatus.REJECTED), {
@@ -81,27 +83,30 @@ const Chat: FC<any> = ({ match }) => {
             }
             context.send(UserEvents.FETCH_FRIENDS_LIST,
                 fetchLocalStorageItem(USER_DATA));
-        });
+        }));
 
-        friendRequestError.subscribe((response) => {
+        subscriptions.add(friendRequestError.subscribe((response) => {
             console.log('friend request error: ', response);
             addToast(response.message, { appearance: ToastAppearances.ERROR });
             context.send(UserEvents.FETCH_FRIENDS_LIST, fetchLocalStorageItem(USER_DATA))
-         });
+         }));
 
-        onFriendsList.subscribe((friendsList) => {
+        subscriptions.add(onFriendsList.subscribe((friendsList) => {
             console.log('fetched friends list: ', friendsList);
             setFriendsList(friendsList.friendsList);
             addToLocalStorage(FRIEND_LIST, friendsList.friendsList);
-        });
+        }));
 
-        onMessage.subscribe((im) => {
+        subscriptions.add(onMessage.subscribe((im) => {
             console.log('incoming im: ', im);
             const chatId = genChatId(im.from, im.to);
             console.log('onMessage chatId: ', chatId)
             addToMessageRepo(im, chatId, IMS);
             setIncoming(im);
-        });
+        }));
+        return () => {
+            subscriptions.unsubscribe();
+        }
     }, []);
 
     const selectChat = (firstUserId: string, SecondUserId: string) => {

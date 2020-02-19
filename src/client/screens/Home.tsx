@@ -1,6 +1,7 @@
 import React, { Fragment, useState, useContext, useEffect } from 'react';
 
 import { useHistory } from 'react-router-dom';
+import { Subscription } from 'rxjs';
 
 import { SocketContext } from '../context/socketContext';
 import { Login, SignUp, SubContainer, Button } from '../components';
@@ -38,6 +39,7 @@ const Home = () => {
     };
 
     useEffect(() => {
+        const subscriptions: Subscription = new Subscription();
         const localUserData = localStorage.getItem(LocalStorageKeys.USER_DATA);
         localUserData && history.push('/chat');
 
@@ -47,11 +49,14 @@ const Home = () => {
         const loginSuccessObservable = context.onLoginSuccess();
         const loginErrorObservable = context.onLoginError();
         // signup observables
-        signUpSuccessObservable.subscribe(handleAuthSuccess);
-        signUpErrorObservable.subscribe(handleAuthError);
+        subscriptions.add(signUpSuccessObservable.subscribe(handleAuthSuccess));
+        subscriptions.add(signUpErrorObservable.subscribe(handleAuthError));
         // login observables
-        loginSuccessObservable.subscribe(handleAuthSuccess);
-        loginErrorObservable.subscribe(handleAuthError);
+        subscriptions.add(loginSuccessObservable.subscribe(handleAuthSuccess));
+        subscriptions.add(loginErrorObservable.subscribe(handleAuthError));
+        return () => {
+            subscriptions.unsubscribe();
+        }
     }, []);
 
     const switchHandler = (event: React.MouseEvent<HTMLButtonElement>): void => {

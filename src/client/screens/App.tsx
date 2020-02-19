@@ -1,6 +1,8 @@
 import React, { useContext, useEffect } from 'react';
 import { Route, Switch, useHistory, useLocation } from "react-router-dom";
-import { ToastProvider } from 'react-toast-notifications'
+import { ToastProvider } from 'react-toast-notifications';
+import Moment from 'react-moment';
+import { Subscription } from 'rxjs';
 
 import { Chat, Home } from '.'
 import { Container } from '../components';
@@ -26,6 +28,7 @@ const App = () => {
      };
 
     useEffect(() => {
+        const subscriptions: Subscription = new Subscription();
         /**
          * Implement client-side reconnection strategy.
          * This sends user credentials to the server on every reconnect to:
@@ -44,14 +47,19 @@ const App = () => {
         onConnection.subscribe(reConnectionHandler);
 
         // reconnectObservable.subscribe(reConnectionHandler);
-        onUserUnAuthorized.subscribe(handleUnAuthorizedUser);
-        userSocketSyncErrorObservable.subscribe(() => {
+        subscriptions.add(onUserUnAuthorized.subscribe(handleUnAuthorizedUser));
+        subscriptions.add(userSocketSyncErrorObservable.subscribe(() => {
             localStorage.removeItem(LocalStorageKeys.USER_DATA);
             history.push(ClientRoutes.HOME);
-        });
-        userSocketSyncSuccessObservable.subscribe((data) => {
-            // console.log('current data on sync success: ', data);
-        });
+        }));
+        subscriptions.add(userSocketSyncSuccessObservable.subscribe((data) => {
+            console.log('current data on sync success: ', data);
+        }));
+        Moment.startPooledTimer();
+        return () => {
+            Moment.clearPooledTimer();
+            subscriptions.unsubscribe();
+        }
     }, []);
 
     return (

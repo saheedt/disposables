@@ -1,8 +1,8 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import Modal from 'react-modal';
 
-import { Subject, interval } from 'rxjs';
-import { debounce } from 'rxjs/operators';
+import { Subject, interval, Subscription } from 'rxjs';
+import { debounce, takeUntil } from 'rxjs/operators';
 
 import { SocketContext } from '../context/socketContext';
 
@@ -28,8 +28,23 @@ const SearchModal = ({ isOpen, toggleModal}: any) => {
     const [response, setResponse] = useState([]);
     const currentUser = Helper.fetchLocalStorageItem(LocalStorageKeys.USER_DATA);
     const [cachedTerm, setCachedTerm] = useState('');
-    const searchTerm = new Subject<string>();
+    let searchTerm: Subject<string> = new Subject<string>();
     const context = useContext(SocketContext);
+
+    useEffect(() => {
+        const subscriptions: Subscription = new Subscription();
+        // searchTerm = new Subject<string>();
+        const searchResponse = context.onUserSearchResponse();
+        subscriptions.add(searchResponse.subscribe((response) => {
+            setResponse(response.response);
+        }));
+
+        return () => {
+            subscriptions.unsubscribe();
+            searchTerm.next();
+            searchTerm.complete();
+        }
+    }, []);
 
     searchTerm.pipe(debounce(() => interval(800)))
         .subscribe((term) => {
@@ -39,10 +54,6 @@ const SearchModal = ({ isOpen, toggleModal}: any) => {
             });
         });
 
-    const searchResponse = context.onUserSearchResponse();
-    searchResponse.subscribe((response) => {
-        setResponse(response.response);
-    });
 
     const onSubmitHandler = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
