@@ -8,12 +8,18 @@ import { Button, ChatListItem, Header, SearchModal } from './';
 interface PropType {
     friendList: any[],
     selectChat: any,
+    selectedFriend: string,
     match: any
 }
-const ChatList: FC<PropType> = ({ friendList, selectChat, match }) => {
+const ChatList: FC<PropType> = ({ friendList, selectChat, selectedFriend, match }) => {
+    const emojis = ['😢', '😳', '🤯', '🤡', '😱', '🌚', '🌝', '😕']
     const [list, setList] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
+    const randomEmoji = (emojiset: string[]): string => {
+        const index = Math.floor(Math.random() * emojiset.length)
+        return emojiset[index];
+    }
 
 
     const handleAddUserModalToggle = () => {
@@ -24,15 +30,16 @@ const ChatList: FC<PropType> = ({ friendList, selectChat, match }) => {
         setList(friendList);
     }, [friendList])
 
-    
+
 
     const RenderList = () => {
         return list.map((item, index) => (
             <ChatListItem
                 key={`${item.userName}__${index}`}
-                id={item._id}
+                friendId={item._id}
                 userName={item.userName}
                 selectChat={selectChat}
+                isActive={item._id === selectedFriend}
                 match={match}
             />
         ));
@@ -50,11 +57,10 @@ const ChatList: FC<PropType> = ({ friendList, selectChat, match }) => {
                 </div>
             </Header>
             <ul className="chat-list">
-                <li className="chat-list-item" >Here we list all..</li>
                 {list && list.length > 0 ?
                     RenderList()
                     :
-                    null
+                    <li className="chat-list-item" >{randomEmoji(emojis)} You have no friend on your list</li>
                 }
             </ul>
         </section>

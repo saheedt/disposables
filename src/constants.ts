@@ -84,7 +84,8 @@ export enum LocalStorageKeys {
     USER_DATA = 'dspsbl__usr',
     FRIEND_REQUESTS = 'dspsbl__frndreqs',
     FRIEND_LIST = 'dspsbl__frndslst',
-    IMS = 'dspsbl__-ims-__'
+    IMS = 'dspsbl__-ims-__',
+    CURRENT_CHAT_ID = 'dspsbl_curr_chat_id',
 }
 
 export enum ClientRoutes {

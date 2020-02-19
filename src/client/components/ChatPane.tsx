@@ -9,7 +9,7 @@ import { SocketContext } from '../context/socketContext';
 interface PropType {
     chatId?: string
     friendRequests?: any
-    incoming: any
+    incoming?: any
     selectedChat: any
 }
 
@@ -18,6 +18,7 @@ const ChatPane: FC<PropType> = ({ chatId, friendRequests, incoming, selectedChat
     const [messages, setMessages] = useState([]);
     const [outgoingMessage, setOutgoingMessage] = useState('');
     const [friend, setFriend] = useState(null);
+    const [clearInput, setClearInput] = useState('');
 
     const context = useContext(SocketContext);
 
@@ -27,10 +28,17 @@ const ChatPane: FC<PropType> = ({ chatId, friendRequests, incoming, selectedChat
 
     const isEmpty = isEmptyOrNull(outgoingMessage);
 
+    const scrollToLast = (config: any) => {
+        const items = document.getElementsByClassName('chat-message-holder');
+        if (items && items.length <= 0) {
+            return;
+        }
+        const last = items[items.length - 1];
+        last.scrollIntoView(config);
+    };
 
     const sendMessage = (event: React.FormEvent<HTMLFormElement>): void => {
         event.preventDefault();
-        console.log('got clicked..');
         const user = fetchLocalStorageItem(USER_DATA);
         const outgoing = {
             message: outgoingMessage,
@@ -39,7 +47,6 @@ const ChatPane: FC<PropType> = ({ chatId, friendRequests, incoming, selectedChat
             id: uuidv4(),
             timestamp: timeStamp()
         };
-        console.log('outgoing: ', outgoing);
         const msgClone = clone(messages);
         msgClone.push(outgoing);
         setMessages(msgClone);
@@ -48,6 +55,8 @@ const ChatPane: FC<PropType> = ({ chatId, friendRequests, incoming, selectedChat
             user,
             chat: outgoing
         });
+        setTimeout(() => scrollToLast({ behavior: "smooth", block: "end" }), 0);
+        setClearInput(uuidv4());
     };
 
     const selectCurrentFriend = () => {
@@ -58,23 +67,25 @@ const ChatPane: FC<PropType> = ({ chatId, friendRequests, incoming, selectedChat
             const currentFriend = friendsList.find((item: any) => item._id === friendId);
             setFriend(currentFriend);
         }
-     };
-
+    };
 
     useEffect(() => {
         console.log('chatpane selectedChat: ', selectedChat)
         setMessages(selectedChat);
         selectCurrentFriend();
+        setTimeout(() => scrollToLast({ block: "end" }), 0);
     }, [selectedChat]);
 
     useEffect(() => {
         if (messages && incoming) {
+            console.log('selected: ', selectedChat);
             const friendsList = fetchLocalStorageItem(FRIEND_LIST);
             const currentFriend = friendsList.find((item: any) => item._id === incoming.from);
             setFriend(currentFriend);
             const msgClone = clone(messages);
             msgClone.push(incoming);
             setMessages(msgClone);
+            setTimeout(() => scrollToLast({ behavior: "smooth", block: "end" }), 0);
         }
 
     }, [incoming]);
@@ -104,7 +115,7 @@ const ChatPane: FC<PropType> = ({ chatId, friendRequests, incoming, selectedChat
                 </div>
             </Header>
             <div className="chat-pane-messages-holder">
-                <ul className="chat-pane-messages">
+                <ul id="messages" className="chat-pane-messages">
                     {/* <li> <span className="incoming">Here we display chat</span> </li> */}
                     {(messages && messages.length > 0) ?
                         [...renderChatMessages()]
@@ -118,6 +129,7 @@ const ChatPane: FC<PropType> = ({ chatId, friendRequests, incoming, selectedChat
             <div className="chat-pane-input-holder">
                 <form className="chat-pane-input-form" onSubmit={sendMessage}>
                     <Input
+                        clear={clearInput}
                         label="Chat input"
                         placeholder="Type a message"
                         extractValue={setOutgoingMessage}

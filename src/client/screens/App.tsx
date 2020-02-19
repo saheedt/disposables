@@ -16,15 +16,19 @@ const App = () => {
     const history = useHistory();
     const location = useLocation();
 
+    const { fetchLocalStorageItem, removeLocalStorageItem } = Helper;
+    const { USER_DATA, CURRENT_CHAT_ID } = LocalStorageKeys;
+    const { HOME } = ClientRoutes;
+
     const reConnectionHandler = () => {
-        const userData = Helper.fetchLocalStorageItem(LocalStorageKeys.USER_DATA);
+        const userData = fetchLocalStorageItem(USER_DATA);
         userData && context.send(UserEvents.USER_RECONNECT_DATA, userData);
-        !userData && location.pathname !== ClientRoutes.HOME && history.push(ClientRoutes.HOME);
+        !userData && location.pathname !== HOME && history.push(HOME);
     };
 
     const handleUnAuthorizedUser = () => {
-        Helper.removeLocalStorageItem(LocalStorageKeys.USER_DATA);
-        history.push(ClientRoutes.HOME);
+        removeLocalStorageItem(USER_DATA);
+        history.push(HOME);
      };
 
     useEffect(() => {
@@ -49,12 +53,13 @@ const App = () => {
         // reconnectObservable.subscribe(reConnectionHandler);
         subscriptions.add(onUserUnAuthorized.subscribe(handleUnAuthorizedUser));
         subscriptions.add(userSocketSyncErrorObservable.subscribe(() => {
-            localStorage.removeItem(LocalStorageKeys.USER_DATA);
-            history.push(ClientRoutes.HOME);
+            removeLocalStorageItem(LocalStorageKeys.USER_DATA);
+            history.push(HOME);
         }));
         subscriptions.add(userSocketSyncSuccessObservable.subscribe((data) => {
-            console.log('current data on sync success: ', data);
+            // console.log('current data on sync success: ', data);
         }));
+        removeLocalStorageItem(CURRENT_CHAT_ID);
         Moment.startPooledTimer();
         return () => {
             Moment.clearPooledTimer();

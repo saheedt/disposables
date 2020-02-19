@@ -7,13 +7,14 @@ import { SocketContext } from '../context/socketContext';
 import { Subscription } from 'rxjs';
 
 interface PropType {
-    id: string,
+    friendId: string,
+    isActive: boolean,
     match: any,
     selectChat: any,
     userName: string,
 }
 
-const ChatListItem: FC<PropType> = ({ id, match, selectChat, userName }) => {
+const ChatListItem: FC<PropType> = ({ friendId, isActive, match, selectChat, userName }) => {
     const [isNewMessage, setIsNewMessage] = useState(false);
     const { CHAT, CHATPANE } = ClientRoutes;
     const { fetchLocalStorageItem } = Helper;
@@ -25,7 +26,7 @@ const ChatListItem: FC<PropType> = ({ id, match, selectChat, userName }) => {
     useEffect(() => {
         const subscriptions: Subscription = new Subscription();
         subscriptions.add(onMessage.subscribe((im) => {
-            if (im.from === id) {
+            if (im.from === friendId) {
                 setIsNewMessage(true);
             }
         }));
@@ -35,17 +36,15 @@ const ChatListItem: FC<PropType> = ({ id, match, selectChat, userName }) => {
     }, []);
 
     const handleClick = (event: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
-        console.log('selected friend _id: ', id);
         const user = fetchLocalStorageItem(USER_DATA);
-        console.log('by friend _id: ', user.data._id);
-        selectChat(id, user.data._id);
+        selectChat(friendId);
         if (isNewMessage) {
             setIsNewMessage(false);
         }
     }
     //
     return (
-        <li className={`chat-list-item ${isNewMessage ? 'new-message': ''}`} onClick={handleClick}>
+        <li className={`chat-list-item ${isNewMessage && !isActive ? 'new-message': ''}`} onClick={handleClick}>
             <Link to={`${match.url === `${CHAT}` ?
                 `${match.url}${CHATPANE}`
                 :

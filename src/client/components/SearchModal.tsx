@@ -1,8 +1,9 @@
 import React, { useState, useContext, useEffect } from 'react';
 import Modal from 'react-modal';
+import { v4 as uuidv4 } from 'uuid';
 
 import { Subject, interval, Subscription } from 'rxjs';
-import { debounce, takeUntil } from 'rxjs/operators';
+import { debounce } from 'rxjs/operators';
 
 import { SocketContext } from '../context/socketContext';
 
@@ -28,12 +29,12 @@ const SearchModal = ({ isOpen, toggleModal}: any) => {
     const [response, setResponse] = useState([]);
     const currentUser = Helper.fetchLocalStorageItem(LocalStorageKeys.USER_DATA);
     const [cachedTerm, setCachedTerm] = useState('');
+    const [clearInput, setClearInput] = useState('');
     let searchTerm: Subject<string> = new Subject<string>();
     const context = useContext(SocketContext);
 
     useEffect(() => {
         const subscriptions: Subscription = new Subscription();
-        // searchTerm = new Subject<string>();
         const searchResponse = context.onUserSearchResponse();
         subscriptions.add(searchResponse.subscribe((response) => {
             setResponse(response.response);
@@ -71,6 +72,8 @@ const SearchModal = ({ isOpen, toggleModal}: any) => {
             requestInitiator: Helper.fetchLocalStorageItem(LocalStorageKeys.USER_DATA)
         };
         context.send(UserEvents.SEND_FRIEND_REQUEST, data);
+        setClearInput(uuidv4());
+        setResponse([]);
         toggleModal();
     };
 
@@ -87,13 +90,14 @@ const SearchModal = ({ isOpen, toggleModal}: any) => {
 
     return (
         <Modal
-            isOpen={isOpen} onRequestClose={toggleModal}
+            isOpen={isOpen} onRequestClose={() => { setResponse([]); toggleModal(); }}
             contentLabel="Add Friend Modal" style={customStyles}>
             <div className="search-modal-container">
                 <h1>Search Friend</h1>
                 <div className="search-modal-input-holder">
                     <form onSubmit={onSubmitHandler}>
                         <Input
+                            clear={clearInput}
                             label="Search friend new friend by username"
                             placeholder="Search friend"
                             extractValue={searchHandler}

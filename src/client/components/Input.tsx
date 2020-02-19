@@ -4,6 +4,7 @@ import { FormInputAsButton } from '../../constants';
 
 interface PropType {
     placeholder?: string
+    clear?: string
     label: string
     type?: string
     disabled?: boolean
@@ -14,7 +15,7 @@ interface PropType {
     extractValue?: Function
 }
 
-const Input: FC<PropType> = ({ placeholder, extractValue, label,
+const Input: FC<PropType> = ({ placeholder, extractValue, clear, label,
     type, autoComplete, required, minLength, maxLength, disabled = false }) => {
     const [value, setValue] = useState('');
 
@@ -29,6 +30,18 @@ const Input: FC<PropType> = ({ placeholder, extractValue, label,
             setValue(label)
         }
     }, []);
+
+    useEffect(() => {
+
+        if (type) {
+            if (type.toLowerCase() !== FormInputAsButton.SUBMIT
+                && type.toLowerCase() !== FormInputAsButton.BUTTON) {
+                setValue('');
+            }
+            return;
+        }
+        setValue('');
+    }, [clear]);
 
     return (
         <input

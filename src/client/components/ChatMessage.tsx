@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, Fragment } from 'react';
 import Moment from 'react-moment';
 
 interface PropType {
@@ -10,13 +10,14 @@ interface PropType {
 const ChatMessage: FC<PropType> = ({ message, time, isIncoming }) => {
 
     return (
-        <li>
-            <div className={`${isIncoming ? 'incoming' : 'author'}`}>
-                <span><p>{message}</p></span>
-                <span><p><Moment local fromNow>{time}</Moment></p></span>
-
-            </div>
-        </li>
+        <Fragment>
+            <li className={`chat-message-wrapper ${isIncoming ? 'incoming' : 'author'}`}>
+                <div className={`chat-message-holder ${isIncoming ? 'incoming-color' : 'author-color'}`}>
+                    <div className="chat-message"><span><p>{message}</p></span></div>
+                    <span><p className="chat-time-holder"><Moment local fromNow>{time}</Moment></p></span>
+                </div>
+            </li>
+        </Fragment>
     );
 }
 

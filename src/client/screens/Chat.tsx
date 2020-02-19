@@ -14,6 +14,7 @@ const Chat: FC<any> = ({ match }) => {
     const [messages, setMessages] = useState([]);
     const [currentChat, setCurrentChat] = useState([]);
     const [currentChatId, setCurrentChatId] = useState(null);
+    const [selectedFriend, setSelectedFriend] = useState(null);
     const [friendRequests, setFriendRequests] = useState({
         friendRequests: [],
         newRequest: false
@@ -26,13 +27,49 @@ const Chat: FC<any> = ({ match }) => {
     const { addToast } = useToasts();
     const {
         addToLocalStorage,
+        clone,
         fetchLocalStorageItem,
         frMessage,
         genChatId,
         routeMediaQueries,
         addToMessageRepo
     } = Helper;
-    const { FRIEND_LIST, FRIEND_REQUESTS, IMS, USER_DATA } = LocalStorageKeys;
+    const { CURRENT_CHAT_ID, FRIEND_LIST, FRIEND_REQUESTS, IMS, USER_DATA } = LocalStorageKeys;
+
+    const selectChat = (friendId: string) => {
+        const userData = fetchLocalStorageItem(USER_DATA);
+        const chatId = genChatId(friendId, userData.data._id);
+        const allIms = fetchLocalStorageItem(IMS);
+        if (!allIms) {
+            const newMessage: any = [{ [`${chatId}`]: [] }];
+            addToLocalStorage(IMS, newMessage);
+            setMessages(newMessage);
+            setCurrentChat(newMessage[0][chatId]);
+            setCurrentChatId(chatId);
+            addToLocalStorage(CURRENT_CHAT_ID, chatId);
+            setSelectedFriend(friendId);
+            return;
+        }
+        const selected = allIms.find((item: any) => Object.keys(item)[0] === chatId);
+        if (!selected) {
+            const newMessage: any = { [`${chatId}`]: [] };
+            const clonedMessages = clone(allIms);
+            clonedMessages.push(newMessage);
+            addToLocalStorage(IMS, clonedMessages);
+            setMessages(newMessage);
+            setCurrentChat(newMessage[chatId]);
+            setCurrentChatId(chatId);
+            addToLocalStorage(CURRENT_CHAT_ID, chatId);
+            setSelectedFriend(friendId);
+            return;
+        }
+        // console.log('selected chat: ', selected);
+        setMessages(selected);
+        setCurrentChat(selected[chatId]);
+        setCurrentChatId(chatId);
+        addToLocalStorage(CURRENT_CHAT_ID, chatId);
+        setSelectedFriend(friendId);
+    };
 
     useEffect(() => {
         const subscriptions: Subscription = new Subscription();
@@ -50,7 +87,6 @@ const Chat: FC<any> = ({ match }) => {
         const onMessage = context.onMessage();
 
         subscriptions.add(newFriendRequest.subscribe((details) => {
-            console.log('new friend reqeust: ', details);
             const pendingRequests = fetchLocalStorageItem(FRIEND_REQUESTS);
             if (!pendingRequests) {
                 const newRequest = [details];
@@ -65,7 +101,6 @@ const Chat: FC<any> = ({ match }) => {
         }));
 
         subscriptions.add(friendRequestAccepted.subscribe((response) => {
-            console.log('friend request accepted: ', response);
             if (response.by) {
                 addToast(frMessage(response.by, FrStatus.ACCEPTED), {
                     appearance: ToastAppearances.SUCCESS
@@ -75,7 +110,6 @@ const Chat: FC<any> = ({ match }) => {
         }));
 
         subscriptions.add(friendRequestRejected.subscribe((response) => {
-            console.log('friend request rejected: ', response);
             if (response.by) {
                 addToast(frMessage(response.by, FrStatus.REJECTED), {
                     appearance: ToastAppearances.ERROR
@@ -100,31 +134,21 @@ const Chat: FC<any> = ({ match }) => {
         subscriptions.add(onMessage.subscribe((im) => {
             console.log('incoming im: ', im);
             const chatId = genChatId(im.from, im.to);
-            console.log('onMessage chatId: ', chatId)
+            const localCurrentChatId = fetchLocalStorageItem(CURRENT_CHAT_ID);
+            console.log('locally set currentChatId: ', localCurrentChatId);
+            console.log('onMessage chatId: ', chatId);
+            console.log('onMessage currentChatId: ', currentChatId);
             addToMessageRepo(im, chatId, IMS);
-            setIncoming(im);
+            if (localCurrentChatId === chatId) {
+                // selectChat(im.from);
+                setIncoming(im);
+            }
+            // setCurrentChatId(localCurrentChatId);
         }));
         return () => {
             subscriptions.unsubscribe();
         }
     }, []);
-
-    const selectChat = (firstUserId: string, SecondUserId: string) => {
-        const chatId = genChatId(firstUserId, SecondUserId);
-        const allIms = fetchLocalStorageItem(IMS);
-        if (!allIms) {
-            const newMessage: any = [{ [`${chatId}`]: [] }];
-            addToLocalStorage(IMS, newMessage);
-            setMessages(newMessage);
-            setCurrentChat(newMessage[0][chatId]);
-            setCurrentChatId(chatId);
-            return;
-        }
-        const selected = allIms.find((item: any) => Object.keys(item)[0] === chatId);
-        console.log('selected chat: ', selected);
-        setCurrentChat(selected[chatId]);
-        setCurrentChatId(chatId);
-    };
 
     return (
         <section className="chat-container">
@@ -134,7 +158,7 @@ const Chat: FC<any> = ({ match }) => {
                         mobile ?
                             (
                                 <Switch>
-                                    <Route path={`${match.url}`} render={(props) => <ChatList friendList={friendsList} selectChat={selectChat} {...props} />} />
+                                    <Route path={`${match.url}`} render={(props) => <ChatList friendList={friendsList} selectChat={selectChat} selectedFriend={selectedFriend} {...props} />} />
                                     <Route path={`${match.url}${ClientRoutes.CHATPANE}`} render={
                                         (props) => <ChatPane chatId={currentChatId} friendRequests={friendRequests} incoming={incoming} selectedChat={currentChat} {...props} />}
                                     />
@@ -143,10 +167,15 @@ const Chat: FC<any> = ({ match }) => {
                             :
                             (
                                 <>
-                                    <Route path={`${match.url}${ClientRoutes.CHATPANE}`} render={(props) => <ChatList friendList={friendsList} selectChat={selectChat} {...props} />} />
-                                    <Route path={`${match.url}${ClientRoutes.CHATPANE}`} render={
-                                        (props) => <ChatPane chatId={currentChatId} friendRequests={friendRequests} incoming={incoming} selectedChat={currentChat} {...props} />}
-                                    />
+                                    <Route path={`${match.url}${ClientRoutes.CHATPANE}`} render={(props) => <ChatList friendList={friendsList} selectChat={selectChat} selectedFriend={selectedFriend}{...props} />} />
+
+                                    {!selectedFriend ?
+                                        <section className="chat-pane-container">Reminder: Sleep is good for you..</section>
+                                        :
+                                        <Route path={`${match.url}${ClientRoutes.CHATPANE}`} render={
+                                            (props) => <ChatPane chatId={currentChatId} friendRequests={friendRequests} incoming={incoming} selectedChat={currentChat} {...props} />}
+                                        />
+                                }
                                     <Redirect from={`${match.url}`} to={`${match.url}${ClientRoutes.CHATPANE}`} />
                                 </>
                             )
