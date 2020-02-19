@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { Button, ChatListItem, Header, SearchModal } from './';
 
+
 interface PropType {
     friendList: any[],
     selectChat: any,
@@ -11,7 +12,9 @@ interface PropType {
 }
 const ChatList: FC<PropType> = ({ friendList, selectChat, match }) => {
     const [list, setList] = useState([]);
-    const [isModalOpen, setIsModalOpen] = useState(false)
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+
 
     const handleAddUserModalToggle = () => {
         setIsModalOpen(!isModalOpen);
@@ -20,6 +23,8 @@ const ChatList: FC<PropType> = ({ friendList, selectChat, match }) => {
     useEffect(() => {
         setList(friendList);
     }, [friendList])
+
+    
 
     const RenderList = () => {
         return list.map((item, index) => (

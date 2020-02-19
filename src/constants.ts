@@ -43,6 +43,11 @@ export enum UserEvents {
     FRIEND_REQUEST_REJECTED = 'friend_request_rejected',
 }
 
+export enum ChatEvents {
+    OUTGOING_IM = 'outgoing_im',
+    INCOMING_IM = 'incoming_im'
+}
+
 export enum UserErrorMesssages {
     USER_ERROR_CREDENTIALS = 'Invalid credentials supplied, please review',
     USER_ERROR_PASSWORD = 'Why password so short?, please review',
@@ -64,10 +69,6 @@ export enum StatusCodes {
     FORBIDDEN = 403,
     NOT_FOUND = 404,
     INTERNAL_SERVER_ERROR = 500
-}
-
-export enum ChatEvents {
-    MESSAGE = 'message'
 }
 
 export enum FormInputAsButton {

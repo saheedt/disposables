@@ -30,11 +30,12 @@ const redisAdapter = RedisController.initRedisAdapder(process.env.REDIS_URI);
 
 // setup socket, it's listeners and handlers
 const socket = new SocketController(server, socketIo);
-const chatHandler = new ChatHandler()
+const chatHandler = new ChatHandler(socket.instance)
 const userHandler = new UserHandler(socket.instance);
 
 setTimeout(() => {
     userHandler.connectDb(mongoClient.instance, redisClient.instance);
+    chatHandler.connectDb(mongoClient.instance, redisClient.instance);
     socket.connect({
         ChatListener: new ChatListener(chatHandler),
         UserListener: new UserListener(userHandler)

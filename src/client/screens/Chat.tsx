@@ -18,6 +18,7 @@ const Chat: FC<any> = ({ match }) => {
         newRequest: false
     });
     const [friendsList, setFriendsList] = useState([]);
+    const [incoming, setIncoming] = useState();
 
     const history = useHistory();
     const context = useContext(SocketContext);
@@ -27,7 +28,8 @@ const Chat: FC<any> = ({ match }) => {
         fetchLocalStorageItem,
         frMessage,
         genChatId,
-        routeMediaQueries
+        routeMediaQueries,
+        addToMessageRepo
     } = Helper;
     const { FRIEND_LIST, FRIEND_REQUESTS, IMS, USER_DATA } = LocalStorageKeys;
 
@@ -43,6 +45,7 @@ const Chat: FC<any> = ({ match }) => {
         const friendRequestRejected = context.onFriendRequestRejected();
         const friendRequestError = context.onFriendRequestError();
         const onFriendsList = context.onFetchFriendsListSuccess();
+        const onMessage = context.onMessage();
 
         newFriendRequest.subscribe((details) => {
             console.log('new friend reqeust: ', details);
@@ -91,6 +94,14 @@ const Chat: FC<any> = ({ match }) => {
             setFriendsList(friendsList.friendsList);
             addToLocalStorage(FRIEND_LIST, friendsList.friendsList);
         });
+
+        onMessage.subscribe((im) => {
+            console.log('incoming im: ', im);
+            const chatId = genChatId(im.from, im.to);
+            console.log('onMessage chatId: ', chatId)
+            addToMessageRepo(im, chatId, IMS);
+            setIncoming(im);
+        });
     }, []);
 
     const selectChat = (firstUserId: string, SecondUserId: string) => {
@@ -120,7 +131,7 @@ const Chat: FC<any> = ({ match }) => {
                                 <Switch>
                                     <Route path={`${match.url}`} render={(props) => <ChatList friendList={friendsList} selectChat={selectChat} {...props} />} />
                                     <Route path={`${match.url}${ClientRoutes.CHATPANE}`} render={
-                                        (props) => <ChatPane chatId={currentChatId} friendRequests={friendRequests} selectedChat={currentChat} {...props} />}
+                                        (props) => <ChatPane chatId={currentChatId} friendRequests={friendRequests} incoming={incoming} selectedChat={currentChat} {...props} />}
                                     />
                                 </Switch>
                             )
@@ -129,7 +140,7 @@ const Chat: FC<any> = ({ match }) => {
                                 <>
                                     <Route path={`${match.url}${ClientRoutes.CHATPANE}`} render={(props) => <ChatList friendList={friendsList} selectChat={selectChat} {...props} />} />
                                     <Route path={`${match.url}${ClientRoutes.CHATPANE}`} render={
-                                        (props) => <ChatPane chatId={currentChatId} friendRequests={friendRequests} selectedChat={currentChat} {...props} />}
+                                        (props) => <ChatPane chatId={currentChatId} friendRequests={friendRequests} incoming={incoming} selectedChat={currentChat} {...props} />}
                                     />
                                     <Redirect from={`${match.url}`} to={`${match.url}${ClientRoutes.CHATPANE}`} />
                                 </>

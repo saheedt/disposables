@@ -1,17 +1,19 @@
 import React, { FC, useState, useEffect, useContext } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
 import { Button, ChatMessage, Header, Input, FriendRequests } from './';
 import Helper from '../utils/helper';
-import { LocalStorageKeys } from '../../constants';
+import { ChatEvents, LocalStorageKeys } from '../../constants';
 import { SocketContext } from '../context/socketContext';
 
 interface PropType {
     chatId?: string
     friendRequests?: any
+    incoming: any
     selectedChat: any
 }
 
-const ChatPane: FC<PropType> = ({ chatId, friendRequests, selectedChat }) => {
+const ChatPane: FC<PropType> = ({ chatId, friendRequests, incoming, selectedChat }) => {
 
     const [messages, setMessages] = useState([]);
     const [outgoingMessage, setOutgoingMessage] = useState('');
@@ -19,14 +21,34 @@ const ChatPane: FC<PropType> = ({ chatId, friendRequests, selectedChat }) => {
 
     const context = useContext(SocketContext);
 
-    const { fetchLocalStorageItem } = Helper;
-    const { FRIEND_LIST, USER_DATA } = LocalStorageKeys;
+    const { OUTGOING_IM } = ChatEvents;
+    const { addToMessageRepo, clone, fetchLocalStorageItem, isEmptyOrNull, timeStamp } = Helper;
+    const { FRIEND_LIST, USER_DATA, IMS } = LocalStorageKeys;
 
-    const isEmpty = Helper.isEmptyOrNull(outgoingMessage);
+    const isEmpty = isEmptyOrNull(outgoingMessage);
+
 
     const sendMessage = (event: React.FormEvent<HTMLFormElement>): void => {
         event.preventDefault();
-        console.log('got clicked..')
+        console.log('got clicked..');
+        const user = fetchLocalStorageItem(USER_DATA);
+        const outgoing = {
+            message: outgoingMessage,
+            from: user.data._id,
+            to: friend._id,
+            id: uuidv4(),
+            timestamp: timeStamp()
+        };
+        console.log('outgoing: ', outgoing);
+        // return;
+        const msgClone = clone(messages);
+        msgClone.push(outgoing);
+        setMessages(msgClone);
+        addToMessageRepo(outgoing, chatId, IMS);
+        context.send(OUTGOING_IM, {
+            user,
+            chat: outgoing
+        });
     };
 
     const selectCurrentFriend = () => {
@@ -41,9 +63,22 @@ const ChatPane: FC<PropType> = ({ chatId, friendRequests, selectedChat }) => {
 
 
     useEffect(() => {
+        console.log('chatpane selectedChat: ', selectedChat)
         setMessages(selectedChat);
         selectCurrentFriend();
     }, [selectedChat]);
+
+    useEffect(() => {
+        if (messages && incoming) {
+            const friendsList = fetchLocalStorageItem(FRIEND_LIST);
+            const currentFriend = friendsList.find((item: any) => item._id === incoming.from);
+            setFriend(currentFriend);
+            const msgClone = clone(messages);
+            msgClone.push(incoming);
+            setMessages(msgClone);
+        }
+
+    }, [incoming]);
 
 
     const renderChatMessages = () => {
@@ -51,7 +86,8 @@ const ChatPane: FC<PropType> = ({ chatId, friendRequests, selectedChat }) => {
             <ChatMessage
                 key={`msg__${index}__msg`}
                 message={item.message}
-                time={item.time}
+                time={item.timestamp}
+                isIncoming={friend._id === item.from}
             />
         ));
     };
@@ -72,7 +108,7 @@ const ChatPane: FC<PropType> = ({ chatId, friendRequests, selectedChat }) => {
                 <ul className="chat-pane-messages">
                     {/* <li> <span className="incoming">Here we display chat</span> </li> */}
                     {(messages && messages.length > 0) ?
-                        {...renderChatMessages()}
+                        [...renderChatMessages()]
                         :
                         <li className="chat-pane-default-message">
                             <span className="author">Le beginning 😁</span>

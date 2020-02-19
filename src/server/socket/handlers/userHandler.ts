@@ -8,7 +8,7 @@ import BaseHandler from './baseHandler';
 
 
 export default class UserHandler extends BaseHandler {
-    private dBInstance: mongo.Db;
+    dBInstance: mongo.Db;
     private redisInstance: any;
     private socketServerInstance: socketIo.Server
 
@@ -20,6 +20,7 @@ export default class UserHandler extends BaseHandler {
     connectDb(dBInstance: mongo.Db, redisInstance: any): void {
         this.dBInstance = dBInstance;
         this.redisInstance = redisInstance;
+        super.connectDataBase(dBInstance);
     }
 
     // TODO: define expected userData object type..
@@ -149,27 +150,6 @@ export default class UserHandler extends BaseHandler {
     }
 
     /** */
-
-    async userVerifiedAndExists(data: any, socket: socketIo.EngineSocket) {
-        const authorizedUser = this.verifyToken(data.token, process.env.JWT_SECRET);
-        if (authorizedUser === UserErrorMesssages.AUTH_INVALID_TOKEN) {
-            socket.emit(UserEvents.USER_UNAUTHORIZED, {
-                code: StatusCodes.UNAUTHORIZED,
-                message: UserErrorMesssages.USER_UNAUTHORIZED
-            });
-            return {verified: false};
-        }
-        const userExists = await this.find({ _id: new mongo.ObjectID(authorizedUser._id) }, DbCollections.users);
-        if (userExists) {
-            socket.emit(UserEvents.USER_AUTHORIZED)
-            return { verified: true, user: userExists };
-        }
-        socket.emit(UserEvents.USER_UNAUTHORIZED, {
-            code: StatusCodes.UNAUTHORIZED,
-            message: UserErrorMesssages.USER_UNAUTHORIZED
-        });
-        return { verified: false };
-    }
 
     async handleReconnection(data: any, socket: socketIo.EngineSocket) {
         const verifiedAndExists = await this.userVerifiedAndExists(data, socket);
@@ -365,21 +345,6 @@ export default class UserHandler extends BaseHandler {
             }).filter((item: any) => item._id.toString() !== record.user_id )
             : []
         socket.emit(UserEvents.USER_SEARCH_RESPONSE, { response: processed});
-    }
-
-    async find(record: any | any[], from: string, isMultiple = false) {
-        const collection = this.dBInstance.collection(from);
-        let result;
-        try {
-            if (isMultiple) {
-                result = await collection.find(record);
-                return result.toArray();
-            }
-            return result = collection.findOne(record);
-        } catch (error) {
-            console.error('[Error]: Find error ', error);
-            return null;
-        }
     }
 
     async findAndUpdate(record: any, from: string) {

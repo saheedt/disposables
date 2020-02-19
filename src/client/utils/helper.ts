@@ -46,4 +46,29 @@ export default class Helper {
     static genChatId(userId1: string, userId2: string) {
         return Helper.sortAlphanumInAsc(userId1, userId2).join('<>');
     }
+
+    static timeStamp() {
+        return new Date().toISOString();
+    }
+
+    static addToMessageRepo(newMessage: any, chatId: string, location: string) {
+        const messagesRepo = Helper.fetchLocalStorageItem(location);
+        if (!messagesRepo) {
+            const message: any = [{ [`${chatId}`]: [] }];
+            message[0][chatId].push(newMessage);
+            Helper.addToLocalStorage(location, message);
+            console.log('new output: ', message);
+            return;
+        }
+        const currentChat = messagesRepo.find((item: any) => Object.keys(item)[0] === chatId);
+        currentChat[chatId].push(newMessage);
+        const output = messagesRepo.map((item: any) => {
+            if (Object.keys(item)[0] === chatId) {
+                item = currentChat
+            }
+            return item
+        });
+        console.log('existing output: ', output);
+        Helper.addToLocalStorage(location, output);
+    };
 }

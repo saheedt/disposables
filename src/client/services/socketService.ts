@@ -19,7 +19,7 @@ export class SocketService {
     }
     // SUpply appropriate types..
     onMessage(): Observable<any> {
-        return fromEvent(this.socket, ChatEvents.MESSAGE);
+        return fromEvent(this.socket, ChatEvents.INCOMING_IM);
     }
 
     onSIgnUpSuccess(): Observable<any> {
