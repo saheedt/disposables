@@ -1,6 +1,7 @@
 import React, { FC, useContext, useEffect, useState } from 'react';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Subscription } from 'rxjs';
 
 import { DropDown, Button } from '.';
 import Helper from '../utils/helper';
@@ -15,10 +16,13 @@ const FriendRequests: FC<PropType> = ({ newFriendRequests }) => {
     const [visualNotification, setVisualNotification] = useState(false);
     const context = useContext(SocketContext);
 
+    const { addToLocalStorage, fetchLocalStorageItem } = Helper;
+    const { FRIEND_REQUESTS, USER_DATA } = LocalStorageKeys;
+
     const removeFromRequests = (friendId: string) => {
-        const requests = Helper.fetchLocalStorageItem(LocalStorageKeys.FRIEND_REQUESTS);
+        const requests = fetchLocalStorageItem(FRIEND_REQUESTS);
         const rest = requests.filter((request: any) => request.friendId !== friendId);
-        Helper.addToLocalStorage(LocalStorageKeys.FRIEND_REQUESTS, rest);
+        addToLocalStorage(FRIEND_REQUESTS, rest);
         setAllRequests(rest);
         setVisualNotification(!visualNotification);
     }
@@ -26,7 +30,7 @@ const FriendRequests: FC<PropType> = ({ newFriendRequests }) => {
     const acceptRequest = (friendId: string) => {
         const data = {
             friendId,
-            userData: Helper.fetchLocalStorageItem(LocalStorageKeys.USER_DATA)
+            userData: fetchLocalStorageItem(USER_DATA)
         };
         context.send(UserEvents.ACCEPT_FRIEND_REQUEST, data);
         removeFromRequests(friendId);
@@ -35,29 +39,35 @@ const FriendRequests: FC<PropType> = ({ newFriendRequests }) => {
     const rejectRequest = (friendId: string) => {
         const data = {
             friendId,
-            userData: Helper.fetchLocalStorageItem(LocalStorageKeys.USER_DATA)
+            userData: fetchLocalStorageItem(USER_DATA)
         };
         context.send(UserEvents.REJECT_FRIEND_REQUEST, data);
         removeFromRequests(friendId);
      };
 
     useEffect(() => {
-        console.log('fetching friend requests...')
+        console.log('fetching friend requests...');
+        const subscriptions: Subscription = new Subscription();
         const onFriendRequestsFetch = context.onFetchFriendRequestsSuccess();
 
         context.send(UserEvents.FETCH_FRIEND_REQUESTS,
-            Helper.fetchLocalStorageItem(LocalStorageKeys.USER_DATA));
+            fetchLocalStorageItem(USER_DATA));
 
-        onFriendRequestsFetch.subscribe((requests) => {
+        subscriptions.add(onFriendRequestsFetch.subscribe((requests) => {
             console.log('and i fetched..', requests);
-            Helper.addToLocalStorage(LocalStorageKeys.FRIEND_REQUESTS, requests.friendRequests)
+            addToLocalStorage(FRIEND_REQUESTS, requests.friendRequests)
             setAllRequests(requests.friendRequests);
-         });
+        }));
+
+        return () => {
+            subscriptions.unsubscribe();
+        }
+
     }, []);
 
     useEffect(() => {
         if (newFriendRequests.friendRequests.length > 0) {
-            const requests = Helper.fetchLocalStorageItem(LocalStorageKeys.FRIEND_REQUESTS);
+            const requests = fetchLocalStorageItem(FRIEND_REQUESTS);
             setAllRequests(requests);
             setVisualNotification(newFriendRequests.newRequest);
         };

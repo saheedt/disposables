@@ -123,7 +123,7 @@ const Chat: FC<any> = ({ match }) => {
             console.log('friend request error: ', response);
             addToast(response.message, { appearance: ToastAppearances.ERROR });
             context.send(UserEvents.FETCH_FRIENDS_LIST, fetchLocalStorageItem(USER_DATA))
-         }));
+        }));
 
         subscriptions.add(onFriendsList.subscribe((friendsList) => {
             console.log('fetched friends list: ', friendsList);

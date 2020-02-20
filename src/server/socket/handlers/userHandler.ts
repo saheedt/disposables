@@ -176,6 +176,17 @@ export default class UserHandler extends BaseHandler {
                 filter: { _id: new mongo.ObjectID(data.requestInitiator.data._id) },
                 update: { $push: { friendsList: { friendId: data.friendId } } }
             };
+            const requesterFriendsList = verifiedAndExists.user.friendsList;
+            if (requesterFriendsList && requesterFriendsList.length > 0) {
+                const isAlreadyFriend = requesterFriendsList.find((friend: any) => friend.friendId === data.friendId);
+                if (isAlreadyFriend) {
+                    socket.emit(UserEvents.FRIEND_REQUEST_ERROR, {
+                        code: StatusCodes.INTERNAL_SERVER_ERROR,
+                        message: UserErrorMesssages.FRIEND_REQUEST_ERROR
+                    });
+                    return;
+                }
+            }
 
             const sendToRequestee = await this.findAndUpdate(toRequestee, DbCollections.users);
             if (sendToRequestee) {

@@ -24,10 +24,12 @@ const customStyles = {
     }
 };
 
-const SearchModal = ({ isOpen, toggleModal}: any) => {
+const SearchModal = ({ isOpen, toggleModal }: any) => {
     Modal.setAppElement(document.getElementById('disposable'));
+    const { fetchLocalStorageItem } = Helper;
+    const { FRIEND_LIST } = LocalStorageKeys;
     const [response, setResponse] = useState([]);
-    const currentUser = Helper.fetchLocalStorageItem(LocalStorageKeys.USER_DATA);
+    const currentUser = fetchLocalStorageItem(LocalStorageKeys.USER_DATA);
     const [cachedTerm, setCachedTerm] = useState('');
     const [clearInput, setClearInput] = useState('');
     let searchTerm: Subject<string> = new Subject<string>();
@@ -69,7 +71,7 @@ const SearchModal = ({ isOpen, toggleModal}: any) => {
     const sendFriendRequest = (userId: string) => () => {
         const data = {
             friendId: userId,
-            requestInitiator: Helper.fetchLocalStorageItem(LocalStorageKeys.USER_DATA)
+            requestInitiator: fetchLocalStorageItem(LocalStorageKeys.USER_DATA)
         };
         context.send(UserEvents.SEND_FRIEND_REQUEST, data);
         setClearInput(uuidv4());
@@ -78,14 +80,19 @@ const SearchModal = ({ isOpen, toggleModal}: any) => {
     };
 
     const renderResponse = (response: any[]) => {
-        return response.map((item, index: number) => (
-            <li key={`${index}_usr_search`} className="search-modal-result-item">
-                <span>{item.userName}</span>
-                <Button handleClick={sendFriendRequest(item._id)}>
-                    Add
-                </Button>
-            </li>
-        ));
+        console.log('chat response:', response);
+        const friendsList = fetchLocalStorageItem(FRIEND_LIST);
+        return response.map((item, index: number) => {
+            const alreadyAdded = friendsList.find((friend: any) => friend._id === item._id);
+            return (
+                <li key={`${index}_usr_search`} className="search-modal-result-item">
+                    <span>{item.userName}</span>
+                    <Button handleClick={sendFriendRequest(item._id)} disabled={alreadyAdded ? true: false}>
+                        Add
+                    </Button>
+                </li>
+            )
+        });
     };
 
     return (

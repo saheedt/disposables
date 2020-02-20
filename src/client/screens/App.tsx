@@ -48,7 +48,7 @@ const App = () => {
 
 
         const onConnection = context.onConnection();
-        onConnection.subscribe(reConnectionHandler);
+        subscriptions.add(onConnection.subscribe(reConnectionHandler));
 
         // reconnectObservable.subscribe(reConnectionHandler);
         subscriptions.add(onUserUnAuthorized.subscribe(handleUnAuthorizedUser));
