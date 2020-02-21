@@ -5,7 +5,7 @@ import { Request, Response } from 'express';
 import socketIo from 'socket.io';
 import dotenv from 'dotenv';
 
-import { SocketController } from './server/socket/SocketController';
+import { SocketController } from './server/socket/socketController';
 import { MongoController, RedisController } from './server/database';
 import { ChatListener, UserListener } from './server/socket/listeners';
 import { ChatHandler, UserHandler } from './server/socket/handlers';
