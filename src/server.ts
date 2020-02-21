@@ -23,6 +23,12 @@ app.get('*', (req: Request, res: Response) => {
     res.sendFile(path.resolve(__dirname, '../dist/client/index.html'));
 });
 
+console.log('server [mongo uri]', process.env.MONGO_URI, process.env['MONGO_URI']);
+console.log('server [redis uri]', process.env.REDIS_URI, process.env['REDIS_URI']);
+console.log('server [mongo db name]', process.env.MONGO_DB_NAME, process.env['MONGO_DB_NAME']);
+console.log('server [salt round]', process.env.SALT_ROUND, process.env['SALT_ROUND']);
+console.log('server [jwt secret]', process.env.JWT_SECRET, process.env['JWT_SECRET']);
+console.log('server [node env]', process.env.NODE_ENV, process.env['NODE_ENV']);
 // spin up a single DB and store instance respectively
 const mongoClient = new MongoController();
 const redisClient = new RedisController();
