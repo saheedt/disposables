@@ -8,7 +8,7 @@ export default class MongoController {
         console.log("[mongo URI]: ", process.env.MONGO_URI)
         const uri = process.env.MONGO_URI;
         // mongo.MongoClient.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
-        new mongo.MongoClient(uri, { useNewUrlParser: true }).connect()
+        new mongo.MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true }).connect()
             .then(client => {
                 if (client)
                     this.mongoInstance = client;
