@@ -114,7 +114,7 @@ const clientConfig = {
             },
         ]
     },
-    plugins: [extractPlugin, shellPlugin]
+    plugins: [extractPlugin] // shellPlugin
 };
 
 module.exports = [serverConfig, clientConfig];
