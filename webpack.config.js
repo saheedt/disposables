@@ -17,9 +17,9 @@ const path = require('path'),
      * the client build runs last, ensuring all files
      * needed by the script will be in place.
      */
-    shellPlugin = new WebpackShellPlugin({
-        onBuildEnd: ['npm start']
-    });
+    // shellPlugin = new WebpackShellPlugin({
+    //     onBuildEnd: ['npm start']
+    // });
 
 /**
  *  The build config had to be splitted into two as one targets web (client),
