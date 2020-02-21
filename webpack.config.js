@@ -18,7 +18,7 @@ const path = require('path'),
      * needed by the script will be in place.
      */
     shellPlugin = new WebpackShellPlugin({
-        onBuildEnd: ['npm run server:dev']
+        onBuildEnd: ['npm start']
     });
 
 /**
