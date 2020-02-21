@@ -1,6 +1,6 @@
 const path = require('path'),
     miniCssExtractPlugin = require('mini-css-extract-plugin'),
-    WebpackShellPlugin = require('webpack-shell-plugin'),
+    // WebpackShellPlugin = require('webpack-shell-plugin'),
     nodeExternals = require('webpack-node-externals'),
     distDir = path.resolve(__dirname, 'dist'),
     srcDir = path.resolve(__dirname, 'src'),
@@ -9,7 +9,7 @@ const path = require('path'),
         filename: 'styles.css',
         chunkFilename: 'styles-[hash].css',
         ignoreOrder: false
-    }),
+    });
 
     /**
      * This plugin helps run npm command on build completion.
