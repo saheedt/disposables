@@ -32,7 +32,8 @@ const Chat: FC<any> = ({ match }) => {
         frMessage,
         genChatId,
         routeMediaQueries,
-        addToMessageRepo
+        addToMessageRepo,
+        noChatSelectedMessage
     } = Helper;
     const { CURRENT_CHAT_ID, FRIEND_LIST, FRIEND_REQUESTS, IMS, USER_DATA } = LocalStorageKeys;
 
@@ -132,18 +133,12 @@ const Chat: FC<any> = ({ match }) => {
         }));
 
         subscriptions.add(onMessage.subscribe((im) => {
-            console.log('incoming im: ', im);
             const chatId = genChatId(im.from, im.to);
             const localCurrentChatId = fetchLocalStorageItem(CURRENT_CHAT_ID);
-            console.log('locally set currentChatId: ', localCurrentChatId);
-            console.log('onMessage chatId: ', chatId);
-            console.log('onMessage currentChatId: ', currentChatId);
             addToMessageRepo(im, chatId, IMS);
             if (localCurrentChatId === chatId) {
-                // selectChat(im.from);
                 setIncoming(im);
             }
-            // setCurrentChatId(localCurrentChatId);
         }));
         return () => {
             subscriptions.unsubscribe();
@@ -170,7 +165,11 @@ const Chat: FC<any> = ({ match }) => {
                                     <Route path={`${match.url}${ClientRoutes.CHATPANE}`} render={(props) => <ChatList friendList={friendsList} selectChat={selectChat} selectedFriend={selectedFriend}{...props} />} />
 
                                     {!selectedFriend ?
-                                        <section className="chat-pane-container">Reminder: Sleep is good for you..</section>
+                                        <section className="chat-pane-container">
+                                            <div className="non-selected">
+                                                <h1>{noChatSelectedMessage}</h1>
+                                            </div>
+                                        </section>
                                         :
                                         <Route path={`${match.url}${ClientRoutes.CHATPANE}`} render={
                                             (props) => <ChatPane chatId={currentChatId} friendRequests={friendRequests} incoming={incoming} selectedChat={currentChat} {...props} />}

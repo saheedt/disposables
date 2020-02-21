@@ -9,12 +9,13 @@ import { Subscription } from 'rxjs';
 interface PropType {
     friendId: string,
     isActive: boolean,
+    isFirst: boolean,
     match: any,
     selectChat: any,
     userName: string,
 }
 
-const ChatListItem: FC<PropType> = ({ friendId, isActive, match, selectChat, userName }) => {
+const ChatListItem: FC<PropType> = ({ friendId, isActive, isFirst, match, selectChat, userName }) => {
     const [isNewMessage, setIsNewMessage] = useState(false);
     const { CHAT, CHATPANE } = ClientRoutes;
     const { fetchLocalStorageItem } = Helper;
@@ -44,7 +45,9 @@ const ChatListItem: FC<PropType> = ({ friendId, isActive, match, selectChat, use
     }
     //
     return (
-        <li className={`chat-list-item ${isNewMessage && !isActive ? 'new-message': ''}`} onClick={handleClick}>
+        <li className={`chat-list-item ${isNewMessage && !isActive ? 'new-message' : ''}
+            ${isActive ? 'chat-list-active-item' : ''} ${isFirst ? 'chat-list-first-item' : ''}`}
+            onClick={handleClick}>
             <Link to={`${match.url === `${CHAT}` ?
                 `${match.url}${CHATPANE}`
                 :

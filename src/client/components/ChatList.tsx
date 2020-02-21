@@ -40,6 +40,7 @@ const ChatList: FC<PropType> = ({ friendList, selectChat, selectedFriend, match 
                 userName={item.userName}
                 selectChat={selectChat}
                 isActive={item._id === selectedFriend}
+                isFirst={index === 0}
                 match={match}
             />
         ));
@@ -60,7 +61,7 @@ const ChatList: FC<PropType> = ({ friendList, selectChat, selectedFriend, match 
                 {list && list.length > 0 ?
                     RenderList()
                     :
-                    <li className="chat-list-item" >{randomEmoji(emojis)} You have no friend on your list</li>
+                    <li className="chat-list-item" >{randomEmoji(emojis)} You have no friend(s) on your list</li>
                 }
             </ul>
         </section>

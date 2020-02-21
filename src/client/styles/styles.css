@@ -222,6 +222,14 @@ button {
     flex-direction: column;
 }
 
+.non-selected {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .chat-list-container {
     height: 100vh;
     background-color: var(--color-white);
@@ -264,6 +272,14 @@ button {
     flex: 2;
     list-style: none;
     overflow-y: scroll;
+}
+
+.chat-list-active-item {
+    background-color: var(--color-background-grey);
+}
+
+.chat-list-first-item {
+    margin-top: 0.5rem;
 }
 
 .chat-list-item {

@@ -61,6 +61,14 @@ export default class Helper {
             return;
         }
         const currentChat = messagesRepo.find((item: any) => Object.keys(item)[0] === chatId);
+        if (!currentChat) {
+            const message: {[chatId: string]: any[]} = { [`${chatId}`]: [] };
+            message[chatId].push(newMessage);
+            const messageRepoClone = Helper.clone(messagesRepo);
+            messageRepoClone.push(message);
+            Helper.addToLocalStorage(location, messageRepoClone);
+            return;
+        }
         currentChat[chatId].push(newMessage);
         const output = messagesRepo.map((item: any) => {
             if (Object.keys(item)[0] === chatId) {
@@ -71,4 +79,8 @@ export default class Helper {
         console.log('existing output: ', output);
         Helper.addToLocalStorage(location, output);
     };
+
+    static get noChatSelectedMessage() {
+        return 'Select a friend from the friends list pane to the left to start chatting..'
+    }
 }
