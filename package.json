@@ -4,11 +4,11 @@
   "description": "dispobable chat",
   "main": "index.js",
   "scripts": {
-    "start": "node dist/server/server.js",
+    "start": "NODE_ENV='production' node dist/server/server.js",
     "dev": "rm -rf dist && webpack -d --watch",
     "server:dev": "NODE_ENV='development' cp src/index.html dist/client/index.html && nodemon dist/server/server.js --watch dist/  ",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "postinstall": "rm -rf dist && webpack -p && cp src/index.html dist/client/index.html"
+    "postinstall": "NODE_ENV='production' rm -rf dist && webpack -p && cp src/index.html dist/client/index.html"
   },
   "keywords": [
     "chat",
@@ -44,9 +44,7 @@
     "socket.io-client": "^2.3.0",
     "socket.io-redis": "^5.2.0",
     "socketio-auth": "^0.1.1",
-    "uuid": "^3.4.0",
-    "webpack": "^4.41.5",
-    "webpack-cli": "^3.3.10"
+    "uuid": "^3.4.0"
   },
   "devDependencies": {
     "@types/bcrypt": "^3.0.0",
@@ -79,6 +77,8 @@
     "ts-loader": "^6.2.1",
     "ts-node": "^8.6.2",
     "typescript": "^3.7.5",
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10",
     "webpack-dev-server": "^3.10.3",
     "webpack-node-externals": "^1.7.2",
     "webpack-shell-plugin": "^0.5.0"
