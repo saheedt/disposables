@@ -8,7 +8,7 @@
     "dev": "rm -rf dist && webpack -d --watch",
     "server:dev": "NODE_ENV='development' cp src/index.html dist/client/index.html && nodemon dist/server/server.js --watch dist/  ",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "postinstall": "NODE_ENV=production rm -rf dist && webpack -p && cp src/index.html dist/client/index.html"
+    "postinstall": "rm -rf dist && webpack -p && cp src/index.html dist/client/index.html"
   },
   "keywords": [
     "chat",
