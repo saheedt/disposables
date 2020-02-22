@@ -33,3 +33,4 @@ Features like video and voice call using WebRTC will also be added.
 - [Redis](redis.io)
 - [MongoDB](mongodb.com)
 - AWS EC2 and Elasticache(redis)
+- RxJS
