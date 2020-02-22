@@ -36,6 +36,7 @@ const serverConfig = {
     entry: {
         server: `${srcDir}/server.ts`
     },
+    mode: 'production',
     output: {
         path: `${distDir}/server`,
         filename: '[name].js'
@@ -80,6 +81,7 @@ const clientConfig = {
     entry: {
         client: `${srcDir}/client/index.tsx`,
     },
+    mode: 'production',
     output: {
         path: `${distDir}/client`,
         filename: '[name].js'
@@ -93,8 +95,11 @@ const clientConfig = {
                 exclude: /node_modules/,
                 use: [
                     {
-                        loader: 'ts-loader'
-                    }
+                        loader: 'ts-loader',
+                        options: {
+                            transpileOnly: true,
+                        }
+                    },
                 ]
             },
             {
