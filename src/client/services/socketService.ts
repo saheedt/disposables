@@ -1,6 +1,8 @@
 import io from 'socket.io-client';
 import { fromEvent, Observable } from 'rxjs';
 
+
+
 import { IoStatusEvents, ChatEvents, UserEvents } from '../../constants';
 
 export class SocketService {
@@ -8,12 +10,19 @@ export class SocketService {
 
     init(port: string | number): SocketService {
         console.log('opening socket in client');
-        this.socket = io(`localhost:${port}`);
+        const currentUrl = window.location.href.split(':');
+        const url = `${currentUrl[0]}:${currentUrl[1]}:${port}`;
+        console.log('target url: ', url);
+        this.socket = io(url);
         return this;
+    }
+
+    onConnection(): Observable<any> {
+        return fromEvent(this.socket, 'connect');
     }
     // SUpply appropriate types..
     onMessage(): Observable<any> {
-        return fromEvent(this.socket, ChatEvents.MESSAGE);
+        return fromEvent(this.socket, ChatEvents.INCOMING_IM);
     }
 
     onSIgnUpSuccess(): Observable<any> {
@@ -34,6 +43,46 @@ export class SocketService {
 
     onReconnect(): Observable<any> {
         return fromEvent(this.socket, IoStatusEvents.RECONNECT)
+    }
+
+    onUserSocketSyncSuccess(): Observable<any> {
+        return fromEvent(this.socket, UserEvents.USER_SOCKET_SYNC_SUCCESS);
+    }
+
+    onUserSocketSyncError(): Observable<any> {
+        return fromEvent(this.socket, UserEvents.USER_SOCKET_SYNC_ERROR);
+    }
+
+    onUserUnAuthorized(): Observable<any> {
+        return fromEvent(this.socket, UserEvents.USER_UNAUTHORIZED)
+    }
+
+    onUserSearchResponse(): Observable<any> {
+        return fromEvent(this.socket, UserEvents.USER_SEARCH_RESPONSE);
+    }
+
+    onNewFriendRequest(): Observable<any> {
+        return fromEvent(this.socket, UserEvents.NEW_FRIEND_REQUEST);
+    }
+
+    onFriendRequestAccepted(): Observable<any> {
+        return fromEvent(this.socket, UserEvents.FRIEND_REQUEST_ACCEPTED)
+    }
+
+    onFriendRequestRejected(): Observable<any> {
+        return fromEvent(this.socket, UserEvents.FRIEND_REQUEST_REJECTED)
+    }
+
+    onFriendRequestError(): Observable<any> {
+        return fromEvent(this.socket, UserEvents.FRIEND_REQUEST_ERROR);
+    }
+
+    onFetchFriendRequestsSuccess(): Observable<any> {
+        return fromEvent(this.socket, UserEvents.FETCH_FRIEND_REQUESTS_SUCCESS);
+    }
+
+    onFetchFriendsListSuccess(): Observable<any> {
+        return fromEvent(this.socket, UserEvents.FETCH_FRIENDS_LIST_SUCCESS);
     }
 
     send(event: string, data: any): void {

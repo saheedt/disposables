@@ -2,7 +2,7 @@ import { Server } from 'http';
 import socketIo from 'socket.io';
 
 import { Listeners } from '../types';
-import { IoStatusEvents, UserEvents } from '../../constants';
+import { IoStatusEvents } from '../../constants';
 
 export class SocketController {
     private io: socketIo.Server;
@@ -19,9 +19,9 @@ export class SocketController {
     connect(listeners: Listeners): void {
         const userListerner = listeners.UserListener;
         const chatListener = listeners.ChatListener;
+
         this.io.on(IoStatusEvents.CONNECTION, (socket: any) => {
             console.info('connected:', socket.id);
-            socket.on(UserEvents.USER_RECONNECT_DATA, (data: any) => { /*console.log(data)*/ });
             userListerner.listen(socket);
             chatListener.listen(socket);
         });
@@ -29,5 +29,9 @@ export class SocketController {
 
     attachAdapter(adapter: any): void {
         this.io.adapter(adapter);
+    }
+
+    get instance(): socketIo.Server {
+        return this.io
     }
 }

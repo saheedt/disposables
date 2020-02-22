@@ -3,8 +3,9 @@ import adapter from 'socket.io-redis';
 import SocketIORedis from 'socket.io-redis';
 import bluebird from 'bluebird';
 
+
 export default class RedisController {
-    private redisInstance: Redis.RedisClient;
+    private redisInstance: any;
 
     constructor() {
         bluebird.promisifyAll(Redis);
@@ -15,7 +16,7 @@ export default class RedisController {
         return adapter(uri, opts);
     }
 
-    get instance(): Redis.RedisClient {
+    get instance(): any {
         return this.redisInstance;
     }
 }

@@ -1,4 +1,4 @@
-import { default as mongo } from 'mongodb';
+import { default as mongo, MongoClient } from 'mongodb';
 
 export default class MongoController {
     private mongoInstance: mongo.MongoClient
@@ -7,7 +7,8 @@ export default class MongoController {
     constructor() {
         console.log("[mongo URI]: ", process.env.MONGO_URI)
         const uri = process.env.MONGO_URI;
-        mongo.MongoClient.connect(uri, { useUnifiedTopology: true })
+        // mongo.MongoClient.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
+        new mongo.MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true }).connect()
             .then(client => {
                 if (client)
                     this.mongoInstance = client;

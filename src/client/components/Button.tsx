@@ -1,15 +1,16 @@
 import React, { FC, MouseEventHandler } from 'react';
 
 interface PropType {
-    text: string,
+    children: any,
     externalStyle?: string,
-    handleClick: MouseEventHandler,
+    handleClick?: any,
+    disabled?: boolean
 }
 
-const Button: FC<PropType> = ({ text, externalStyle, handleClick}) => {
+const Button: FC<PropType> = ({ disabled, externalStyle, handleClick, children }) => {
     return (
-        <button className={`button ${externalStyle}`} onClick={handleClick}>
-            {text}
+        <button className={`button ${externalStyle}`} disabled={disabled} onClick={handleClick}>
+            {children}
         </button>
     )
 };

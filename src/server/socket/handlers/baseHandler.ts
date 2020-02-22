@@ -1,8 +1,17 @@
+import socketIo from 'socket.io';
 import { default as mongo } from 'mongodb';
 import { hash, compare } from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
+import { DbCollections, StatusCodes, UserErrorMesssages, UserEvents } from '../../../constants';
+
 export default class BaseHandler {
+
+    dBInstance: mongo.Db;
+
+    connectDataBase(dBInstance: mongo.Db) {
+        this.dBInstance = dBInstance;
+    }
 
     isEmptyOrNull(str: string) {
         return (!str || /^\s*$/.test(str));
@@ -51,17 +60,53 @@ export default class BaseHandler {
             return null;
         }
     }
-    // supply correct return type after confirming token creation content
-    verifyToken(token: string, secret: string) {
+
+    verifyToken(token: string, secret: string): any {
         try {
             const decoded = jwt.verify(token, secret);
             return decoded;
         } catch (error) {
             console.error('[Error]: ', 'Error verifying token ', error);
-            return 'Invalid token';
+            return UserErrorMesssages.AUTH_INVALID_TOKEN;
         }
     }
+
     clone(data: any) {
         return JSON.parse(JSON.stringify(data));
+    }
+    async userVerifiedAndExists(data: any, socket: socketIo.EngineSocket) {
+        const authorizedUser = this.verifyToken(data.token, process.env.JWT_SECRET);
+        if (authorizedUser === UserErrorMesssages.AUTH_INVALID_TOKEN) {
+            socket.emit(UserEvents.USER_UNAUTHORIZED, {
+                code: StatusCodes.UNAUTHORIZED,
+                message: UserErrorMesssages.USER_UNAUTHORIZED
+            });
+            return { verified: false };
+        }
+        const userExists = await this.find({ _id: new mongo.ObjectID(authorizedUser._id) }, DbCollections.users);
+        if (userExists) {
+            socket.emit(UserEvents.USER_AUTHORIZED)
+            return { verified: true, user: userExists };
+        }
+        socket.emit(UserEvents.USER_UNAUTHORIZED, {
+            code: StatusCodes.UNAUTHORIZED,
+            message: UserErrorMesssages.USER_UNAUTHORIZED
+        });
+        return { verified: false };
+    }
+
+    async find(record: any | any[], from: string, isMultiple = false) {
+        const collection = this.dBInstance.collection(from);
+        let result;
+        try {
+            if (isMultiple) {
+                result = await collection.find(record);
+                return result.toArray();
+            }
+            return result = collection.findOne(record);
+        } catch (error) {
+            console.error('[Error]: Find error ', error);
+            return null;
+        }
     }
 }
