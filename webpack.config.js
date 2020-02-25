@@ -28,7 +28,7 @@ const path = require('path'),
 
 // Configuaration file for server side (Express and Socket.io)
 const serverConfig = {
-    devtool: "source-map",
+    // devtool: "source-map",
     resolve: {
         // Add '.ts' and '.tsx' as resolvable extensions.
         extensions: [".js", ".ts", ".json"]
@@ -60,19 +60,19 @@ const serverConfig = {
                     }
                 ]
             },
-            {
-                enforce: "pre",
-                test: /\.js?$/,
-                loader: "source-map-loader",
-                exclude: /node_modules/
-            },
+            // {
+            //     enforce: "pre",
+            //     test: /\.js?$/,
+            //     loader: "source-map-loader",
+            //     exclude: /node_modules/
+            // },
         ]
     }
 };
 
 // configuration entry for client side (React)
 const clientConfig = {
-    devtool: "source-map",
+    // devtool: "source-map",
     resolve: {
         // Add '.ts' and '.tsx' as resolvable extensions.
         extensions: [".js", ".ts", ".tsx", ".json"]
@@ -109,15 +109,52 @@ const clientConfig = {
                     'css-loader'
                 ]
             },
-            {
-                enforce: "pre",
-                test: /\.js?$/,
-                loader: "source-map-loader",
-                exclude: /node_modules/
-            },
+            // {
+            //     enforce: "pre",
+            //     test: /\.js?$/,
+            //     loader: "source-map-loader",
+            //     exclude: /node_modules/
+            // },
         ]
     },
     plugins: [extractPlugin] // shellPlugin
 };
 
-module.exports = [serverConfig, clientConfig];
+const testConfig = {
+    resolve: {
+        // Add '.ts' and '.tsx' as resolvable extensions.
+        extensions: [".js", ".ts", ".json"]
+    },
+    entry: {
+        server: `${srcDir}/tests/server/server.spec.ts`
+    },
+    output: {
+        path: `${distDir}/tests`,
+        filename: '[name].spec.js'
+    },
+    target: 'node',
+    // This helps to solve an issue where __dirname returns '/'
+    // node installation path. This helps to set it to source path
+    node: {
+        __dirname: true
+    },
+    externals: [nodeExternals()],
+    module: {
+        rules: [
+            {
+                test: /\.ts$/,
+                include: srcDir,
+                exclude: /node_modules/,
+                use: [
+                    {
+                        loader: 'ts-loader'
+                    }
+                ]
+
+            }
+        ]
+    }
+};
+
+
+module.exports = [serverConfig, clientConfig, testConfig];
