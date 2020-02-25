@@ -23,6 +23,12 @@ Features like video and voice call using WebRTC will also be added.
     - In Devlopment: `npm run dev`
     - In Production: `npm start`
 
+### Testing
+*NOTE:* Please checkout the `test` branch or currently opened pull request as tests and CI are worked on.
+Testing Socket.io has been interesting (read as weird) so far.
+
+ Run `npm run test` to start automated test.
+
 ### Technologies Used
 - [Node](nodejs.org)
 - [ExpressJS](expressjs.com)
