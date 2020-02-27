@@ -34,11 +34,12 @@ describe('socket.io server', () => {
     });
     // Investigate interesting behavior where only one it block passes once the
     // second block is introduced, except timeout is increased.
-    it('should call handleReconnection', (done) => {
+    it('should call handleReconnection and supply right data', (done) => {
         spyOn(userHandler, 'handleReconnection');
         client.emit(UserEvents.USER_RECONNECT_DATA);
         setTimeout(() => {
             expect(userHandler.handleReconnection).toHaveBeenCalled();
+            expect(userHandler.handleReconnection).toHaveBeenCalledWith(undefined, jasmine.anything());
             done();
         }, 200);
     });
@@ -49,6 +50,58 @@ describe('socket.io server', () => {
         client.emit(UserEvents.CREATE_USER);
         setTimeout(() => {
             expect(userHandler.createUser).toHaveBeenCalledTimes(2);
+            done();
+        }, 200);
+    });
+
+    it('should call authenticateUser handler', (done) => {
+        spyOn(userHandler, 'authenticateUser');
+        client.emit(UserEvents.AUTH_USER);
+        setTimeout(() => {
+            expect(userHandler.authenticateUser).toHaveBeenCalled();
+            done();
+        }, 200);
+    });
+
+    it('should call userSearch handler with search data', (done) => {
+        const searchTerm = { data: 'term' };
+        spyOn(userHandler, 'userSearch');
+        client.emit(UserEvents.USER_SEARCH, searchTerm);
+        setTimeout(() => {
+            expect(userHandler.userSearch).toHaveBeenCalledWith(searchTerm, jasmine.anything());
+            done();
+        }, 200);
+    });
+
+    it('should call friendRequest handler with empty friend data', (done) => {
+        spyOn(userHandler, 'friendRequest');
+        const friendData = {};
+        client.emit(UserEvents.SEND_FRIEND_REQUEST, friendData);
+        setTimeout(() => {
+            expect(userHandler.friendRequest).toHaveBeenCalled();
+            expect(userHandler.friendRequest).toHaveBeenCalledWith(friendData, jasmine.anything());
+            done();
+        }, 200);
+    });
+
+    it('should call acceptFriendRequest handler with null friend data', (done) => {
+        spyOn(userHandler, 'acceptFriendRequest');
+        const friendData: null = null ;
+        client.emit(UserEvents.ACCEPT_FRIEND_REQUEST, friendData);
+        setTimeout(() => {
+            expect(userHandler.acceptFriendRequest).toHaveBeenCalled();
+            expect(userHandler.acceptFriendRequest).toHaveBeenCalledWith(friendData, jasmine.anything());
+            done();
+        }, 200);
+    });
+
+    it('should call rejectFriendRequest handler with null friend data', (done) => {
+        spyOn(userHandler, 'acceptFriendRequest');
+        const friendData = {friendId: 'abc'};
+        client.emit(UserEvents.ACCEPT_FRIEND_REQUEST, friendData);
+        setTimeout(() => {
+            expect(userHandler.acceptFriendRequest).toHaveBeenCalled();
+            expect(userHandler.acceptFriendRequest).toHaveBeenCalledWith({ friendId: jasmine.stringMatching(friendData.friendId)}, jasmine.anything());
             done();
         }, 200);
     });
