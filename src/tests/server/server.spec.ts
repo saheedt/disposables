@@ -96,12 +96,46 @@ describe('socket.io server', () => {
     });
 
     it('should call rejectFriendRequest handler with null friend data', (done) => {
-        spyOn(userHandler, 'acceptFriendRequest');
+        spyOn(userHandler, 'rejectFriendRequest');
         const friendData = {friendId: 'abc'};
-        client.emit(UserEvents.ACCEPT_FRIEND_REQUEST, friendData);
+        client.emit(UserEvents.REJECT_FRIEND_REQUEST, friendData);
         setTimeout(() => {
-            expect(userHandler.acceptFriendRequest).toHaveBeenCalled();
-            expect(userHandler.acceptFriendRequest).toHaveBeenCalledWith({ friendId: jasmine.stringMatching(friendData.friendId)}, jasmine.anything());
+            expect(userHandler.rejectFriendRequest).toHaveBeenCalled();
+            expect(userHandler.rejectFriendRequest).toHaveBeenCalledWith({ friendId: jasmine.stringMatching(friendData.friendId)}, jasmine.anything());
+            done();
+        }, 200);
+    });
+
+    it('should call fetchFriendsList handler', (done) => {
+        spyOn(userHandler, 'fetchFriendsList');
+        client.emit(UserEvents.FETCH_FRIENDS_LIST);
+        setTimeout(() => {
+            expect(userHandler.fetchFriendsList).toHaveBeenCalled();
+            done();
+        }, 200);
+    });
+
+    it('should call fetchFriendRequests handler', (done) => {
+        spyOn(userHandler, 'fetchFriendRequests');
+        client.emit(UserEvents.FETCH_FRIEND_REQUESTS);
+        setTimeout(() => {
+            expect(userHandler.fetchFriendRequests).toHaveBeenCalled();
+            done();
+        }, 200);
+    });
+
+
+    it('should call outGoingIm handler with right data', (done) => {
+        const outgoing = {
+            message: 'xyz',
+            userData: {
+                token: 'def'
+            }
+        }
+        spyOn(chatHandler, 'outGoingIm');
+        client.emit(ChatEvents.OUTGOING_IM, outgoing);
+        setTimeout(() => {
+            expect(chatHandler.outGoingIm).toHaveBeenCalledWith(outgoing, jasmine.anything());;
             done();
         }, 200);
     });
