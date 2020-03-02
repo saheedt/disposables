@@ -54,13 +54,24 @@ jobs:
   upload-coverage:
     <<: *defaults
     steps:
+      - checkout
       - attach_workspace:
           at: ~/disposables
+      - restore_cache:
+          key: disposables-cache-{{ checksum "package-lock.json" }}
+      - run:
+          name: npm install
+          command: npm install
+      - save_cache:
+          key: disposables-cache-{{ checksum "package-lock.json" }}
+          paths:
+            - ./node_modules
       - run:
           name: Generate and sum coverage
           command: |
             echo "export CC_TEST_REPORTER_ID=${CC_TEST_REPORTER_ID}" >> $BASH_ENV
             echo $BASH_ENV
+            ls ~/disposables
             npm run test:coverage
       - persist_to_workspace:
           root: ~/disposables
