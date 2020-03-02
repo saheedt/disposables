@@ -44,6 +44,10 @@ jobs:
       - run:
           name: Run server tests
           command: npm run test
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - disposables
 
   upload-coverage:
     <<: *defaults
@@ -53,6 +57,7 @@ jobs:
       - run:
           name: Generate and sum coverage
           command: |
+            ls ~ ~/disposables
             echo "export CC_TEST_REPORTER_ID=${CC_TEST_REPORTER_ID}" >> $BASH_ENV
             npm run test:coverage
       - persist_to_workspace:
