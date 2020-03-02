@@ -45,9 +45,11 @@ jobs:
           name: Run server tests
           command: npm run test
       - persist_to_workspace:
-          root: ~/
+          root: ~/disposables
           paths:
-            - disposables
+            - .nyc_output
+            - coverage
+            - package.json
 
   upload-coverage:
     <<: *defaults
