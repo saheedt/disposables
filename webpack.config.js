@@ -28,7 +28,7 @@ const path = require('path'),
 
 // Configuaration file for server side (Express and Socket.io)
 const serverConfig = {
-    // devtool: "source-map",
+    devtool: "source-map",
     resolve: {
         // Add '.ts' and '.tsx' as resolvable extensions.
         extensions: [".js", ".ts", ".json"]

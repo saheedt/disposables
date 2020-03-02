@@ -1,0 +1,90 @@
+version: 2.1
+defaults: &defaults
+  parallelism: 3
+  working_directory: ~/disposables
+  docker:
+    - image: circleci/node:12.14.1
+      environment:
+        NODE_ENV: test
+
+jobs:
+  build:
+    <<: *defaults
+    steps:
+      - run:
+        name: Install Dockerize
+        command: wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && sudo tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+          environment:
+            DOCKERIZE_VERSION: v0.6.1
+
+      - run:
+          name: Install Code Climate Test Reporter
+          command: |
+            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ~/disposables/cc-test-reporter
+            chmod +x ~/disposables/cc-test-reporter
+
+      - persist_to_workspace:
+          root: ~/disposables
+          paths:
+            - cc-test-reporter
+
+  server-tests:
+    <<: *defaults
+    steps:
+
+      - checkout
+
+      - attach_workspace:
+          at: ~/disposables
+
+      - restore_cache:
+          key: disposables-cache-{{ checksum "package-lock.json" }}
+
+      - run:
+          name: npm install
+          command: npm install
+
+      - save_cache:
+          key: disposables-cache-{{ checksum "package-lock.json" }}
+          paths:
+            - ./node_modules
+
+      - run:
+          name: Run server tests
+          command: npm run test
+
+  upload-coverage:
+    <<: *defaults
+
+    - attach_workspace:
+          at: ~/disposables
+
+    - run:
+        name: Generate and sum coverage
+        command: |
+          echo "export CC_TEST_REPORTER_ID=${CC_TEST_REPORTER_ID}" >> $BASH_ENV
+          npm run test:coverage
+
+    - persist_to_workspace:
+        root: ~/disposables
+        paths:
+          - coverage.json
+
+    - run:
+          name: Upload coverage to Code Climate
+          command: |
+            ~/disposables/cc-test-reporter upload-coverage -i ~/disposables/coverage.json
+
+
+workflows:
+  version: 2.1
+
+  commit:
+    jobs:
+      - build
+      - server-tests:
+          requires:
+            - build
+      - upload-coverage:
+        requires:
+          - server-tests
