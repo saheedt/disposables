@@ -7,10 +7,10 @@
     "start": "node dist/server/server.js",
     "dev": "rm -rf dist && webpack -d --watch",
     "server:dev": "NODE_ENV='development' cp src/index.html dist/client/index.html && nodemon dist/server/server.js --watch dist/  ",
-    "test": "rm -rf .nyc_output && npm run test:server",
+    "test": "rm -rf .nyc_output && rm -rf coverage && npm run test:server",
     "test:server": "nyc --silent --no-clean jasmine --config=./jasmine.json && nyc report --reporter=lcov --reporter=text",
     "test:coverage": "nyc merge .nyc_output coverage.json",
-    "postinstall": "rm -rf dist && rm -rf coverage && webpack -p && cp src/index.html dist/client/index.html"
+    "postinstall": "rm -rf dist && webpack -p && cp src/index.html dist/client/index.html"
   },
   "keywords": [
     "chat",
