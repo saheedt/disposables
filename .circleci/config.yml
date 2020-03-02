@@ -85,7 +85,7 @@ jobs:
             ls ~/disposables
             echo $BASH_ENV
             echo ${CC_TEST_REPORTER_ID}
-            ~/disposables/cc-test-reporter upload-coverage -i ~/disposables/coverage.json
+            ~/disposables/cc-test-reporter upload-coverage -r ${CC_TEST_REPORTER_ID} -i ~/disposables/coverage.json
 
 workflows:
   version: 2.1
