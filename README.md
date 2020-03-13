@@ -6,9 +6,6 @@ It is Suitable for disposable/temporary instant messaging.
 NOTE: The application is still in active development phase and still lacks some basic features, like a sign out option, alot of those features will be added imminently.
 Features like video and voice call using WebRTC will also be added.
 
-### Link to hosted instance
-[Link](http://52.205.251.109:3000/)
-
 ### Installation
 
 * Navigate to a directory on your machine using your favourite terminal / command line application
