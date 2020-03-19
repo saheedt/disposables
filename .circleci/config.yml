@@ -75,6 +75,7 @@ jobs:
             echo ${CC_TEST_REPORTER_ID}
             ls ~/disposables
             npm run test:coverage
+            ls ~/disposables
       - persist_to_workspace:
           root: ~/disposables
           paths:
