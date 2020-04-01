@@ -48,7 +48,7 @@ jobs:
           root: ~/disposables
           paths:
             - .nyc_output
-            - coverage.json
+            - coverage
             - package.json
 
   upload-coverage:
@@ -86,7 +86,7 @@ jobs:
             ls ~/disposables
             echo $BASH_ENV
             echo ${CC_TEST_REPORTER_ID}
-            # echo "export CC_TEST_REPORTER_ID=${CC_TEST_REPORTER_ID}" >> $BASH_ENV
+            echo "export CC_TEST_REPORTER_ID=${CC_TEST_REPORTER_ID}" >> $BASH_ENV
             # -r ${CC_TEST_REPORTER_ID}
             ~/disposables/cc-test-reporter upload-coverage --debug -i ~/disposables/coverage.json
 
