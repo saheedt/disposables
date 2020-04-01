@@ -86,7 +86,9 @@ jobs:
             ls ~/disposables
             echo $BASH_ENV
             echo ${CC_TEST_REPORTER_ID}
-            ~/disposables/cc-test-reporter upload-coverage -r ${CC_TEST_REPORTER_ID} -i ~/disposables/coverage.json
+            # echo "export CC_TEST_REPORTER_ID=${CC_TEST_REPORTER_ID}" >> $BASH_ENV
+            # -r ${CC_TEST_REPORTER_ID}
+            ~/disposables/cc-test-reporter upload-coverage --debug -i ~/disposables/coverage.json
 
 workflows:
   version: 2.1
