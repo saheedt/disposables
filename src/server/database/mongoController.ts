@@ -7,7 +7,6 @@ export default class MongoController {
     constructor() {
         console.log("[mongo URI]: ", process.env.MONGO_URI)
         const uri = process.env.MONGO_URI;
-        // mongo.MongoClient.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
         new mongo.MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true }).connect()
             .then(client => {
                 if (client)
@@ -20,7 +19,6 @@ export default class MongoController {
                 // { code: 500, message: 'Internal server error' };
                 console.error('error connecting to db: ', e)
             });
-
     }
 
     get instance(): mongo.Db {

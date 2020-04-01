@@ -223,11 +223,12 @@ button {
 }
 
 .non-selected {
-    height: 100%;
     width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
+    margin: auto;
+    padding: 5%;
 }
 
 .chat-list-container {

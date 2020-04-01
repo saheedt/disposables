@@ -1,7 +1,7 @@
 import React, { FC, useState, useEffect, useContext } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
-import { Button, ChatMessage, Header, Input, FriendRequests } from './';
+import { Button, ChatMessage, Header, Input, FriendRequests, NoChatSelected } from './';
 import Helper from '../utils/helper';
 import { ChatEvents, LocalStorageKeys } from '../../constants';
 import { SocketContext } from '../context/socketContext';
@@ -11,9 +11,10 @@ interface PropType {
     friendRequests?: any
     incoming?: any
     selectedChat: any
+    selectedFriend: any
 }
 
-const ChatPane: FC<PropType> = ({ chatId, friendRequests, incoming, selectedChat }) => {
+const ChatPane: FC<PropType> = ({ chatId, friendRequests, incoming, selectedChat, selectedFriend}) => {
 
     const [messages, setMessages] = useState([]);
     const [outgoingMessage, setOutgoingMessage] = useState('');
@@ -23,7 +24,7 @@ const ChatPane: FC<PropType> = ({ chatId, friendRequests, incoming, selectedChat
     const context = useContext(SocketContext);
 
     const { OUTGOING_IM } = ChatEvents;
-    const { addToMessageRepo, clone, fetchLocalStorageItem, isEmptyOrNull, timeStamp } = Helper;
+    const { addToMessageRepo, clone, fetchLocalStorageItem, isEmptyOrNull, timeStamp, noChatSelectedMessage } = Helper;
     const { FRIEND_LIST, USER_DATA, IMS } = LocalStorageKeys;
 
     const isEmpty = isEmptyOrNull(outgoingMessage);
@@ -114,31 +115,37 @@ const ChatPane: FC<PropType> = ({ chatId, friendRequests, incoming, selectedChat
                     <span>{friend && friend.userName}</span>
                 </div>
             </Header>
-            <div className="chat-pane-messages-holder">
-                <ul id="messages" className="chat-pane-messages">
-                    {/* <li> <span className="incoming">Here we display chat</span> </li> */}
-                    {(messages && messages.length > 0) ?
-                        [...renderChatMessages()]
-                        :
-                        <li className="chat-pane-default-message">
-                            <span className="">Le beginning 😁</span>
-                        </li>
-                    }
-                </ul>
-            </div>
-            <div className="chat-pane-input-holder">
-                <form className="chat-pane-input-form" onSubmit={sendMessage}>
-                    <Input
-                        clear={clearInput}
-                        label="Chat input"
-                        placeholder="Type a message"
-                        extractValue={setOutgoingMessage}
-                    />
-                    <Button disabled={isEmpty}>
-                        send
-                    </Button>
-                </form>
-            </div>
+            {!selectedFriend ?
+                <NoChatSelected noChatSelectedMessage={noChatSelectedMessage} />
+            :
+            <>
+                <div className="chat-pane-messages-holder">
+                    <ul id="messages" className="chat-pane-messages">
+                        {/* <li> <span className="incoming">Here we display chat</span> </li> */}
+                        {(messages && messages.length > 0) ?
+                            [...renderChatMessages()]
+                            :
+                            <li className="chat-pane-default-message">
+                                <span className="">Le beginning 😁</span>
+                            </li>
+                        }
+                    </ul>
+                </div>
+                <div className="chat-pane-input-holder">
+                    <form className="chat-pane-input-form" onSubmit={sendMessage}>
+                        <Input
+                            clear={clearInput}
+                            label="Chat input"
+                            placeholder="Type a message"
+                            extractValue={setOutgoingMessage}
+                        />
+                        <Button disabled={isEmpty}>
+                            send
+                        </Button>
+                    </form>
+                </div>
+            </>
+            }
         </section>
     );
 };

@@ -12,7 +12,7 @@ import Header from './Header';
 import SearchModal from './SearchModal';
 import DropDown from './DropDown';
 import FriendRequests from './FriendRequests';
-
+import NoChatSelected from './NoChatSelected';
 export {
     Container,
     SubContainer,
@@ -27,5 +27,6 @@ export {
     Header,
     SearchModal,
     DropDown,
-    FriendRequests
+    FriendRequests,
+    NoChatSelected
 };
