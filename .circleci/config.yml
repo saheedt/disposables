@@ -25,6 +25,15 @@ jobs:
           root: ~/disposables
           paths:
             - cc-test-reporter
+      - run:
+          name: Install jq
+          command: |
+            curl -L https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 > ~/disposables/jq
+            chmod +x ~/disposables/jq
+      - persist_to_workspace:
+          root: ~/disposables
+          paths:
+            - jq
 
   server-tests:
     <<: *defaults
@@ -84,9 +93,10 @@ jobs:
           name: Upload coverage to Code Climate
           command: |
             ls ~/disposables
-            echo $BASH_ENV
-            echo ${CC_TEST_REPORTER_ID}
+            # echo $BASH_ENV
+            # echo ${CC_TEST_REPORTER_ID}
             echo "export CC_TEST_REPORTER_ID=${CC_TEST_REPORTER_ID}" >> $BASH_ENV
+            cat 'coverage.json' | jq
             # -r ${CC_TEST_REPORTER_ID}
             ~/disposables/cc-test-reporter upload-coverage --debug -i coverage.json -r ${CC_TEST_REPORTER_ID}
 
