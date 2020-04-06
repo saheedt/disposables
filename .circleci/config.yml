@@ -83,7 +83,7 @@ jobs:
           name: Upload coverage to Code Climate
           command: |
             echo "export CC_TEST_REPORTER_ID=${CC_TEST_REPORTER_ID}" >> $BASH_ENV
-            ~/disposables/cc-test-reporter upload-coverage --debug -i codeclimate.total.json
+            ~/disposables/cc-test-reporter upload-coverage -i codeclimate.total.json
 
 workflows:
   version: 2.1
