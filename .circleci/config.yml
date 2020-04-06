@@ -52,13 +52,17 @@ jobs:
             - ./node_modules
       - run:
           name: Run server tests
-          command: npm run test
+          command: |
+            npm run test
+            ~/disposables/cc-test-reporter format-coverage -t lcov -o ~/disposables/codeclimate.server.json
+
       - persist_to_workspace:
           root: ~/disposables
           paths:
             - .nyc_output
             - coverage
             - package.json
+            - codeclimate.server.json
 
   upload-coverage:
     <<: *defaults
@@ -78,27 +82,22 @@ jobs:
       - run:
           name: Generate and sum coverage
           command: |
-            echo "env hidden CC_TEST_REPORTER_ID is: ${CC_TEST_REPORTER_ID}"
             echo "export CC_TEST_REPORTER_ID=${CC_TEST_REPORTER_ID}" >> $BASH_ENV
-            echo $BASH_ENV
-            echo ${CC_TEST_REPORTER_ID}
             ls ~/disposables
-            npm run test:coverage
+            # npm run test:coverage
+            ~/disposables/cc-test-reporter sum-coverage ~/disposables/codeclimate.server.json -p 1 -o ~/disposables/codeclimate.total.json
             ls ~/disposables
       - persist_to_workspace:
           root: ~/disposables
           paths:
-            - coverage.json
+            - codeclimate.total.json
       - run:
           name: Upload coverage to Code Climate
           command: |
             ls ~/disposables
-            # echo $BASH_ENV
-            # echo ${CC_TEST_REPORTER_ID}
             echo "export CC_TEST_REPORTER_ID=${CC_TEST_REPORTER_ID}" >> $BASH_ENV
-            cat 'coverage.json' | jq
-            # -r ${CC_TEST_REPORTER_ID}
-            ~/disposables/cc-test-reporter upload-coverage --debug -i coverage.json -r ${CC_TEST_REPORTER_ID}
+            cat 'codeclimate.total.json' | jq
+            ~/disposables/cc-test-reporter upload-coverage --debug -i codeclimate.total.json -r ${CC_TEST_REPORTER_ID}
 
 workflows:
   version: 2.1
