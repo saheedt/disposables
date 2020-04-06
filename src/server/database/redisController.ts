@@ -5,7 +5,7 @@ import bluebird from 'bluebird';
 
 
 export default class RedisController {
-    private redisInstance: any;
+    private redisInstance: Redis.RedisClient;
 
     constructor() {
         bluebird.promisifyAll(Redis);
@@ -16,7 +16,7 @@ export default class RedisController {
         return adapter(uri, opts);
     }
 
-    get instance(): any {
+    get instance(): Redis.RedisClient {
         return this.redisInstance;
     }
 }

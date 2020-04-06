@@ -108,3 +108,6 @@ dist
 
 # Mac files
 .DS_Store
+
+# Coverage file
+coverage.json

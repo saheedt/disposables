@@ -1,3 +1,7 @@
+[![CircleCI](https://circleci.com/gh/saheedt/disposables/tree/master.svg?style=shield)](https://circleci.com/gh/saheedt/disposables/tree/master)
+[![Maintainability](https://api.codeclimate.com/v1/badges/7b0943dc58647859d310/maintainability)](https://codeclimate.com/github/saheedt/disposables/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/7b0943dc58647859d310/test_coverage)](https://codeclimate.com/github/saheedt/disposables/test_coverage)
+
 # Disposables
 An instant messaging application purposely designed not to keep / remember any form of data except from those needed for authentication and authorization. All chat data are stored on user's device and it can be cleared out at will.
 
@@ -36,3 +40,4 @@ Testing Socket.io has been interesting (read as weird) so far.
 - [MongoDB](mongodb.com)
 - AWS EC2 and Elasticache(redis)
 - RxJS
+- Jasmine
