@@ -25,15 +25,6 @@ jobs:
           root: ~/disposables
           paths:
             - cc-test-reporter
-      - run:
-          name: Install jq
-          command: |
-            curl -L https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 > ~/disposables/jq
-            chmod +x ~/disposables/jq
-      - persist_to_workspace:
-          root: ~/disposables
-          paths:
-            - jq
 
   server-tests:
     <<: *defaults
@@ -83,10 +74,7 @@ jobs:
           name: Generate and sum coverage
           command: |
             echo "export CC_TEST_REPORTER_ID=${CC_TEST_REPORTER_ID}" >> $BASH_ENV
-            ls ~/disposables
-            # npm run test:coverage
             ~/disposables/cc-test-reporter sum-coverage ~/disposables/codeclimate.server.json -p 1 -o ~/disposables/codeclimate.total.json
-            ls ~/disposables
       - persist_to_workspace:
           root: ~/disposables
           paths:
@@ -94,10 +82,8 @@ jobs:
       - run:
           name: Upload coverage to Code Climate
           command: |
-            ls ~/disposables
             echo "export CC_TEST_REPORTER_ID=${CC_TEST_REPORTER_ID}" >> $BASH_ENV
-            cat 'codeclimate.total.json' | jq
-            ~/disposables/cc-test-reporter upload-coverage --debug -i codeclimate.total.json -r ${CC_TEST_REPORTER_ID}
+            ~/disposables/cc-test-reporter upload-coverage --debug -i codeclimate.total.json
 
 workflows:
   version: 2.1
