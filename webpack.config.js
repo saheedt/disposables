@@ -1,15 +1,19 @@
 const path = require('path'),
+    webpack = require('webpack'),
     miniCssExtractPlugin = require('mini-css-extract-plugin'),
-    // WebpackShellPlugin = require('webpack-shell-plugin'),
     nodeExternals = require('webpack-node-externals'),
     distDir = path.resolve(__dirname, 'dist'),
     srcDir = path.resolve(__dirname, 'src'),
-
     extractPlugin = new miniCssExtractPlugin({
         filename: 'styles.css',
         chunkFilename: 'styles-[hash].css',
         ignoreOrder: false
+    }),
+    environmentVariables = new webpack.DefinePlugin({
+        'process.env.PORT': JSON.stringify(`${process.env.PORT}`),
     });
+
+    // WebpackShellPlugin = require('webpack-shell-plugin'),
 
     /**
      * This plugin helps run npm command on build completion.
@@ -117,7 +121,7 @@ const clientConfig = {
             // },
         ]
     },
-    plugins: [extractPlugin] // shellPlugin
+    plugins: [extractPlugin, environmentVariables] // shellPlugin
 };
 
 const testConfig = {
