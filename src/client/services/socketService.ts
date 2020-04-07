@@ -13,7 +13,7 @@ export class SocketService {
         const currentUrl = window.location.href.split(':');
         const url = `${currentUrl[0]}:${currentUrl[1]}:${port}`;
         console.log('target url: ', url);
-        this.socket = io(url);
+        this.socket = io();
         return this;
     }
 

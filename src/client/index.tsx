@@ -13,7 +13,7 @@ import { SocketContext } from './context/socketContext';
 
 import './styles/styles.css';
 
-const port = process.env.PORT;
+const port = process.env.PORT || 3000;
 const socketContext = new SocketService().init(port);
 
 library.add(faUserPlus, faBell, farBell);
