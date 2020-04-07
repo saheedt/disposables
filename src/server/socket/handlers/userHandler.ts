@@ -25,6 +25,7 @@ export default class UserHandler extends BaseHandler {
 
     // TODO: define expected userData object type..
     async createUser(userData: any, socket: socketIo.EngineSocket) {
+        console.log('=== incoming new user: ', userData, ' ===');
         if (this.isEmptyOrNull(userData.email) || !this.isEmail(userData.email)) {
             socket.emit(UserEvents.CREATE_USER_ERROR, {
                 code: StatusCodes.BAD_REQUEST,
@@ -40,8 +41,9 @@ export default class UserHandler extends BaseHandler {
             return;
         }
         const isExisting = await this.find({ email: userData.email }, DbCollections.users);
-
+        console.log('=== user exists?: ', isExisting, ' ===');
         if (!isExisting) {
+            console.log('=== user is nonexistent.. ===');
             const isUserNameTaken = await this.find({ userName: userData.userName }, DbCollections.users);
             if (isUserNameTaken) {
                 socket.emit(UserEvents.CREATE_USER_ERROR,
@@ -51,6 +53,7 @@ export default class UserHandler extends BaseHandler {
                     });
                 return;
             }
+            console.log('=== username not taken.. ===');
             const passwordHash = await this.hashPassWord(userData.password);
             if (!passwordHash) {
                 // emit error and return...
@@ -61,6 +64,7 @@ export default class UserHandler extends BaseHandler {
                     });
                 return;
             }
+            console.log('=== password hashed ===');
             const insertRecord = {
                 email: userData.email,
                 userName: userData.userName,
@@ -69,6 +73,8 @@ export default class UserHandler extends BaseHandler {
                 friendRequest: [] as []
             }
             const response = await this.insert(insertRecord, DbCollections.users);
+            console.log('=== insert response: ', response, ' ===');
+            console.log('=== insert response result: ', response.result, ' ===');
             if (response.result.ok) {
                 delete insertRecord.password
                 const toToken = this.clone(insertRecord);
@@ -83,12 +89,15 @@ export default class UserHandler extends BaseHandler {
                     },
                     token
                 });
+                console.log('=== adding new user to redis ===');
                 const userSocketSync = await this.redisInstance.setAsync(toToken._id.toString(), socket.id);
+                console.log('=== successfully added user to redis ===');
                 if (userSocketSync !== "OK") {
                     socket.emit(UserEvents.USER_SOCKET_SYNC_ERROR);
                     return;
                 }
                 socket.emit(UserEvents.USER_SOCKET_SYNC_SUCCESS, { user: toToken.userName, socketId: socket.id });
+                console.log('=== success and we emmited new user ===');
             }
             return;
         }
