@@ -9,7 +9,7 @@ export default class RedisController {
 
     constructor() {
         bluebird.promisifyAll(Redis);
-        this.redisInstance = Redis.createClient(process.env.REDIS_URI);
+        this.redisInstance = Redis.createClient(process.env.REDIS_URL);
     }
 
     public static initRedisAdapder(uri: string, opts?: SocketIORedis.SocketIORedisOptions ): adapter.RedisAdapter {
