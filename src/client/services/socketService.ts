@@ -11,7 +11,7 @@ export class SocketService {
     init(port: string | number): SocketService {
         console.log('opening socket in client');
         const currentUrl = window.location.href.split(':');
-        const url = `${currentUrl[0]}:${currentUrl[1].split('/')[0]}:${port}`;
+        const url = `${currentUrl[0]}:${currentUrl[1]}:${port}`;
         console.log('target url: ', url);
         this.socket = io(url);
         return this;
