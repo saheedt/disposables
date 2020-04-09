@@ -256,7 +256,7 @@ button {
 
 }
 
-.chat-pane-header-child-top{
+.chat-pane-header-child-top {
     display: flex;
     justify-content: flex-end;
 }
@@ -273,6 +273,10 @@ button {
     flex: 2;
     list-style: none;
     overflow-y: scroll;
+}
+.chat-list-header-child-top {
+    display: flex;
+    justify-content: flex-end;
 }
 
 .chat-list-active-item {

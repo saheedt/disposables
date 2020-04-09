@@ -152,18 +152,18 @@ const Chat: FC<any> = ({ match }) => {
                         mobile ?
                             (
                                 <Switch>
-                                    <Route path={`${match.url}`} render={(props) => <ChatList friendList={friendsList} selectChat={selectChat} selectedFriend={selectedFriend} {...props} />} />
+                                    <Route path={`${match.url}`} render={(props) => <ChatList friendList={friendsList} friendRequests={friendRequests} selectChat={selectChat} selectedFriend={selectedFriend} isMobile={mobile} {...props} />} />
                                     <Route path={`${match.url}${ClientRoutes.CHATPANE}`} render={
-                                        (props) => <ChatPane chatId={currentChatId} friendRequests={friendRequests} incoming={incoming} selectedChat={currentChat} selectedFriend={selectedFriend} {...props} />}
+                                        (props) => <ChatPane chatId={currentChatId} friendRequests={friendRequests} incoming={incoming} selectedChat={currentChat} selectedFriend={selectedFriend} isMobile={mobile} {...props} />}
                                     />
                                 </Switch>
                             )
                             :
                             (
                                 <>
-                                    <Route path={`${match.url}${ClientRoutes.CHATPANE}`} render={(props) => <ChatList friendList={friendsList} selectChat={selectChat} selectedFriend={selectedFriend} {...props} />} />
+                                    <Route path={`${match.url}${ClientRoutes.CHATPANE}`} render={(props) => <ChatList friendList={friendsList} selectChat={selectChat} selectedFriend={selectedFriend} isMobile={mobile} {...props} />} />
                                     <Route path={`${match.url}${ClientRoutes.CHATPANE}`} render={
-                                        (props) => <ChatPane chatId={currentChatId} friendRequests={friendRequests} incoming={incoming} selectedChat={currentChat} selectedFriend={selectedFriend} {...props} />} />
+                                        (props) => <ChatPane chatId={currentChatId} friendRequests={friendRequests} incoming={incoming} selectedChat={currentChat} selectedFriend={selectedFriend} isMobile={mobile} {...props} />} />
                                     <Redirect from={`${match.url}`} to={`${match.url}${ClientRoutes.CHATPANE}`} />
                                 </>
                             )

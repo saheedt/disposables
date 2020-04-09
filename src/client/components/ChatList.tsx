@@ -2,16 +2,18 @@ import React, { FC, useState, useEffect } from 'react';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { Button, ChatListItem, Header, SearchModal } from './';
+import { Button, ChatListItem, FriendRequests, Header, SearchModal } from './';
 
 
 interface PropType {
-    friendList: any[],
-    selectChat: any,
-    selectedFriend: string,
+    friendList: any[]
+    friendRequests?: any
+    selectChat: any
+    selectedFriend: string
+    isMobile: boolean
     match: any
 }
-const ChatList: FC<PropType> = ({ friendList, selectChat, selectedFriend, match }) => {
+const ChatList: FC<PropType> = ({ friendList, friendRequests, selectChat, selectedFriend, isMobile, match }) => {
     const emojis = ['😢', '😳', '🤯', '🤡', '😱', '🌚', '🌝', '😕']
     const [list, setList] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -49,7 +51,14 @@ const ChatList: FC<PropType> = ({ friendList, selectChat, selectedFriend, match 
     return (
         <section className="chat-list-container">
             <Header styleClass="chat-list-header">
-                <div className="chat-view-header-child-top"></div>
+                <div className="chat-view-header-child-top chat-list-header-child-top">
+                    {
+                        isMobile &&
+                        <div className="chat-pane-friend-rqst-bell">
+                            <FriendRequests newFriendRequests={friendRequests}/>
+                        </div>
+                    }
+                </div>
                 <div className="chat-view-header-child-bottom">
                     <Button handleClick={handleAddUserModalToggle}>
                         <FontAwesomeIcon className="user-add-font general-icon-font" icon="user-plus"/>

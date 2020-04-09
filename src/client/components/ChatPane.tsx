@@ -10,11 +10,12 @@ interface PropType {
     chatId?: string
     friendRequests?: any
     incoming?: any
+    isMobile: boolean
     selectedChat: any
     selectedFriend: any
 }
 
-const ChatPane: FC<PropType> = ({ chatId, friendRequests, incoming, selectedChat, selectedFriend}) => {
+const ChatPane: FC<PropType> = ({ chatId, friendRequests, incoming, isMobile, selectedChat, selectedFriend}) => {
 
     const [messages, setMessages] = useState([]);
     const [outgoingMessage, setOutgoingMessage] = useState('');
