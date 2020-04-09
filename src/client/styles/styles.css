@@ -274,6 +274,7 @@ button {
     list-style: none;
     overflow-y: scroll;
 }
+
 .chat-list-header-child-top {
     display: flex;
     justify-content: flex-end;
