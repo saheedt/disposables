@@ -152,10 +152,10 @@ const Chat: FC<any> = ({ match }) => {
                         mobile ?
                             (
                                 <Switch>
-                                    <Route path={`${match.url}`} render={(props) => <ChatList friendList={friendsList} friendRequests={friendRequests} selectChat={selectChat} selectedFriend={selectedFriend} isMobile={mobile} {...props} />} />
                                     <Route path={`${match.url}${ClientRoutes.CHATPANE}`} render={
                                         (props) => <ChatPane chatId={currentChatId} friendRequests={friendRequests} incoming={incoming} selectedChat={currentChat} selectedFriend={selectedFriend} isMobile={mobile} {...props} />}
                                     />
+                                    <Route path={`${match.url}`} render={(props) => <ChatList friendList={friendsList} friendRequests={friendRequests} selectChat={selectChat} selectedFriend={selectedFriend} isMobile={mobile} {...props} />} />
                                 </Switch>
                             )
                             :

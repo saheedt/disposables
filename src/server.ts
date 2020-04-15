@@ -30,7 +30,7 @@ const redisAdapter = RedisController.initRedisAdapder(process.env.REDIS_URL);
 
 // setup socket, it's listeners and handlers
 const socket = new SocketController(server, socketIo);
-const chatHandler = new ChatHandler(socket.instance)
+const chatHandler = new ChatHandler(socket.instance);
 const userHandler = new UserHandler(socket.instance);
 
 setTimeout(() => {

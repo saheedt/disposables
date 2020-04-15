@@ -4,7 +4,6 @@ export enum IoStatusEvents {
     RECONNECT = 'reconnect',
 }
 
-
 export enum UserEvents {
     CREATE_USER = 'create_user',
     CREATE_USER_SUCCESS = 'create_user_success',
