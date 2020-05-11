@@ -41,6 +41,5 @@ Testing Socket.io has been interesting (read as weird) so far.
 - [Socket.io](socket.io)
 - [Redis](redis.io)
 - [MongoDB](mongodb.com)
-- AWS EC2 and Elasticache(redis)
 - RxJS
 - Jasmine
