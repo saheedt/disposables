@@ -1,17 +1,29 @@
 const path = require('path'),
     webpack = require('webpack'),
     miniCssExtractPlugin = require('mini-css-extract-plugin'),
+    { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer'),
+    compressionPlugin = require('compression-webpack-plugin'),
+    htmlWebpackPlugin = require('html-webpack-plugin'),
+    optimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin'),
+    terserJSPlugin = require('terser-webpack-plugin'),
     nodeExternals = require('webpack-node-externals'),
     distDir = path.resolve(__dirname, 'dist'),
     srcDir = path.resolve(__dirname, 'src'),
     extractPlugin = new miniCssExtractPlugin({
-        filename: 'styles.css',
+        filename: 'styles.[contenthash].css', //'styles.css',
         chunkFilename: 'styles-[hash].css',
         ignoreOrder: false
     }),
     environmentVariables = new webpack.DefinePlugin({
         'process.env.PORT': JSON.stringify(`${process.env.PORT}`),
-    });
+    }),
+    analyzeBundle = new BundleAnalyzerPlugin({
+        analyzerMode: "static",
+    }),
+    gzip = new compressionPlugin(),
+    htmlGenerator = new htmlWebpackPlugin({ template: 'src/index.html' }),
+    cssMiniMizer = new optimizeCSSAssetsPlugin({}),
+    jsMinimizer = new terserJSPlugin({});
 
     // WebpackShellPlugin = require('webpack-shell-plugin'),
 
@@ -32,7 +44,6 @@ const path = require('path'),
 
 // Configuaration file for server side (Express and Socket.io)
 const serverConfig = {
-    devtool: "source-map",
     resolve: {
         // Add '.ts' and '.tsx' as resolvable extensions.
         extensions: [".js", ".ts", ".json"]
@@ -76,7 +87,6 @@ const serverConfig = {
 
 // configuration entry for client side (React)
 const clientConfig = {
-    // devtool: "source-map",
     resolve: {
         // Add '.ts' and '.tsx' as resolvable extensions.
         extensions: [".js", ".ts", ".tsx", ".json"]
@@ -86,7 +96,7 @@ const clientConfig = {
     },
     output: {
         path: `${distDir}/client`,
-        filename: '[name].js'
+        filename: '[name].[contenthash].js'
     },
     target: 'web',
     module: {
@@ -112,16 +122,13 @@ const clientConfig = {
                     },
                     'css-loader'
                 ]
-            },
-            // {
-            //     enforce: "pre",
-            //     test: /\.js?$/,
-            //     loader: "source-map-loader",
-            //     exclude: /node_modules/
-            // },
+            }
         ]
     },
-    plugins: [extractPlugin, environmentVariables] // shellPlugin
+    optimization: {
+        minimizer: [jsMinimizer, cssMiniMizer]
+    },
+    plugins: [extractPlugin, environmentVariables, analyzeBundle, gzip, htmlGenerator] // shellPlugin
 };
 
 const testConfig = {
