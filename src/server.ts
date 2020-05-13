@@ -1,7 +1,7 @@
 import { createServer } from 'http';
 import path from 'path';
 import express from 'express';
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import socketIo from 'socket.io';
 import dotenv from 'dotenv';
 
@@ -18,9 +18,18 @@ const server = createServer(app);
 const PORT = process.env.PORT || 3000;
 
 app.use(express.static(path.resolve(__dirname, '../dist/client')));
-
 app.get('*', (req: Request, res: Response) => {
     res.sendFile(path.resolve(__dirname, '../dist/client/index.html'));
+});
+app.get('*.css', (req: Request, res: Response, next: NextFunction) => {
+    req.url = req.url + '.gz';
+    res.set('Content-Encoding', 'gzip');
+    next();
+});
+app.get('*.js', (req: Request, res: Response, next: NextFunction) => {
+    req.url = req.url + '.gz';
+    res.set('Content-Encoding', 'gzip');
+    next();
 });
 
 // spin up a single DB and store instance respectively
