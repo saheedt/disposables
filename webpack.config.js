@@ -21,7 +21,10 @@ const path = require('path'),
         analyzerMode: "static",
     }),
     gzip = new compressionPlugin(),
-    htmlGenerator = new htmlWebpackPlugin({ template: 'src/index.html' }),
+    htmlGenerator = new htmlWebpackPlugin({
+        template: 'src/index.html',
+        scriptLoading: 'defer'
+    }),
     cssMiniMizer = new optimizeCSSAssetsPlugin({}),
     jsMinimizer = new terserJSPlugin({});
 
@@ -36,6 +39,36 @@ const path = require('path'),
     // shellPlugin = new WebpackShellPlugin({
     //     onBuildEnd: ['npm start']
     // });
+    
+    /**
+     * custom plugin that moves all webpage asset tags from head to body tags.
+     */
+    class AssetTagsToBody {
+        apply (compiler) {
+          compiler.hooks.compilation.tap('MyPlugin', (compilation) => {
+            // Static Plugin interface |compilation |HOOK NAME | register listener 
+            const hooks = htmlWebpackPlugin.getHooks(compilation);
+            hooks.alterAssetTagGroups.tapAsync(
+              'AssetTagsToBody', // <-- Set a meaningful name here for stacktraces
+              (data, cb) => {
+                // Manipulate the content
+                if (data && data.headTags.length > 0) {
+                    data.headTags.forEach((tag, _) => {
+                        const attr = tag.attributes;
+                        (attr && attr.href && attr.href.endsWith('.css')) ? 
+                            data.bodyTags.unshift(tag) 
+                        :
+                            data.bodyTags.push(tag);
+                    });
+                    data.headTags = [];
+                }
+                // Tell webpack to move on
+                cb(null, data)
+              }
+            )
+          })
+        }
+    }
 
 /**
  *  The build config had to be splitted into two as one targets web (client),
@@ -128,7 +161,7 @@ const clientConfig = {
     optimization: {
         minimizer: [jsMinimizer, cssMiniMizer]
     },
-    plugins: [extractPlugin, environmentVariables, analyzeBundle, gzip, htmlGenerator] // shellPlugin
+    plugins: [extractPlugin, environmentVariables, analyzeBundle, gzip, htmlGenerator, new AssetTagsToBody()] // shellPlugin
 };
 
 const testConfig = {
