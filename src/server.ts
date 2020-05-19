@@ -17,19 +17,23 @@ const server = createServer(app);
 
 const PORT = process.env.PORT || 3000;
 
-app.use(express.static(path.resolve(__dirname, '../dist/client')));
-app.get('*', (req: Request, res: Response) => {
-    res.sendFile(path.resolve(__dirname, '../dist/client/index.html'));
-});
 app.get('*.css', (req: Request, res: Response, next: NextFunction) => {
     req.url = req.url + '.gz';
     res.set('Content-Encoding', 'gzip');
+    res.set('Content-Type', 'text/css');
     next();
 });
 app.get('*.js', (req: Request, res: Response, next: NextFunction) => {
     req.url = req.url + '.gz';
     res.set('Content-Encoding', 'gzip');
+    res.set('Content-Type', 'text/javascript');
     next();
+});
+
+app.use(express.static(path.resolve(__dirname, '../dist/client'), { maxAge: "30d" }));
+
+app.get('*', (req: Request, res: Response) => {
+    res.sendFile(path.resolve(__dirname, '../dist/client/index.html'));
 });
 
 // spin up a single DB and store instance respectively
